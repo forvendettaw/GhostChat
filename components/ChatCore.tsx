@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { getMessages, storeMessage } from "@/lib/storage";
 import { initPeer, connectToPeer, sendToAll, destroy } from "@/lib/peer-manager";
+import { inviteManager } from "@/lib/invite-manager";
 import Settings from "./Settings";
+import ErrorHandler from "./ErrorHandler";
 
 interface ChatCoreProps {
   invitePeerId: string | null;
@@ -26,6 +28,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [linkCreated, setLinkCreated] = useState(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleMessage = (fromPeerId: string, data: string) => {
@@ -48,6 +51,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       console.log('[CHAT] Connection lost');
       setConnected(false);
       setConnecting(false);
+      setError('Connection lost. Your friend may have closed their tab.');
     };
 
     const peer = initPeer('', handleMessage, handleConnect, handleDisconnect);
@@ -61,7 +65,13 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       if (invitePeerId) {
         console.log('[PEER] Connecting to invite:', invitePeerId);
         setConnecting(true);
-        connectToPeer(invitePeerId, handleMessage, handleConnect, handleDisconnect);
+        inviteManager.validateInvite(invitePeerId).then(validPeerId => {
+          if (validPeerId) {
+            connectToPeer(validPeerId, handleMessage, handleConnect, handleDisconnect);
+          } else {
+            connectToPeer(invitePeerId, handleMessage, handleConnect, handleDisconnect);
+          }
+        });
       } else {
         setShowInvite(true);
       }
@@ -93,9 +103,15 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     setInput("");
   };
 
+  const handleRetry = () => {
+    setError(null);
+    window.location.reload();
+  };
+
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+      <ErrorHandler error={error} onRetry={handleRetry} onDismiss={() => setError(null)} />
       <div style={{ padding: 16, borderBottom: "1px solid #333", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: 12, opacity: 0.6 }}>

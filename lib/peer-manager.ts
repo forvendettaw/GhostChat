@@ -1,4 +1,5 @@
 import Peer, { DataConnection } from 'peerjs';
+import { getTURNServers } from './turn-config';
 
 let peer: Peer | null = null;
 const connections = new Map<string, DataConnection>();
@@ -31,21 +32,7 @@ export function initPeer(roomId: string, onMessage: (peerId: string, data: strin
   peer = new Peer(id, {
     ...peerConfig,
     config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        { 
-          urls: 'turn:openrelay.metered.ca:80',
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        },
-        {
-          urls: 'turn:openrelay.metered.ca:443',
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        }
-      ]
+      iceServers: getTURNServers()
     }
   });
 
