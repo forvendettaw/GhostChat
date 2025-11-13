@@ -1,203 +1,250 @@
-# PrivyPeer: Decentralized P2P Privacy Chat
+# GhostChat: Ephemeral P2P Chat
 
-A free, open-source Progressive Web App for true peer-to-peer private chatting with viral sharing mechanics. No servers, no tracking, just direct encrypted connections between users.
+> Your messages vanish like ghosts. **True peer-to-peer** chat where messages travel directly between users - no servers storing or reading your conversations. Everything exists only in memory and disappears when you close the tab. Zero traces, zero history.
 
-## Overview
+[![p2p](https://img.shields.io/badge/p2p-enabled-blue)](https://github.com/topics/p2p)
+[![privacy](https://img.shields.io/badge/privacy-first-green)](https://github.com/topics/privacy)
+[![webrtc](https://img.shields.io/badge/webrtc-powered-orange)](https://github.com/topics/webrtc)
+[![nextjs](https://img.shields.io/badge/nextjs-15-black)](https://github.com/topics/nextjs)
+[![pwa](https://img.shields.io/badge/pwa-installable-purple)](https://github.com/topics/pwa)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**PrivyPeer** is a privacy-first P2P chat PWA that spreads organically through sharing mechanics. Using WebRTC for direct peer connections and Gun.js for signaling, it provides end-to-end encrypted chats that work on any device with a browser.
+---
+
+## For Users
+
+### What is GhostChat?
+
+GhostChat is a truly private chat app where messages travel directly between you and your friend - no servers storing or reading your conversations. When you close the tab, everything vanishes completely. No history, no traces, no tracking. Your messages are ghosts that disappear.
+
+### How to Use
+
+**Step 1: You open the app**
+- Go to the website (e.g., `https://ghostchat.app`)
+- Click "Start Chatting"
+- You'll see a "Join a Room" screen
+
+**Step 2: Create a room**
+- Type any room name you want (e.g., "secret123", "coffee-chat", "team-meeting")
+- Click "Join Room"
+- You're now in the room, waiting for others
+
+**Step 3: Your friend joins**
+- Tell your friend the room name (via phone, email, etc.)
+- They open the same website
+- They type the SAME room name
+- They click "Join Room"
+
+**Step 4: Chat directly**
+- Once both of you are in the same room, you're connected
+- Type messages and press Enter or click Send
+- Messages travel directly between you (peer-to-peer)
+- No servers can read your messages
+
+**Step 5: End the chat**
+- Close the browser tab
+- All messages instantly disappear from memory
+- No history, no traces left behind
+
+**Important**: Both people must be online at the same time. If someone closes their tab, the connection ends.
 
 ### Key Features
 
-- **True P2P**: Direct WebRTC connections, messages never touch servers
-- **Viral Mechanics**: Share-to-unlock features, QR invites, referral tracking
-- **Privacy Core**: E2E encryption, memory-only storage, zero tracking, ephemeral identities
-- **Cross-Platform**: Works on desktop, mobile, and tablets (any modern browser)
-- **Installable**: PWA can be installed like a native app
-- **Memory-Only**: Messages stored in RAM only, disappear when tab closes (zero disk traces)
-- **SEO Optimized**: Next.js with meta tags, Open Graph, Twitter Cards for viral growth
+- **Direct connections**: Messages never touch our servers
+- **Memory-only**: No messages saved to disk
+- **Ephemeral**: New identity each session
+- **Auto-blur**: Screen blurs when you switch tabs
+- **No accounts**: No signup, no phone number, no email
+- **Works everywhere**: Desktop, mobile, any browser
 
-### Target Users
+### Privacy Guarantees
 
-Privacy enthusiasts seeking secure alternatives to centralized chat apps. Initial seeding via Reddit/HN communities.
+- **RAM-only storage**: Messages never touch your disk
+- **Auto-wipe**: Everything erased when tab closes
+- **No history**: Messages exist only during the session
+- **No tracking**: Zero analytics, logs, or user data
+- **No accounts**: No signup, email, or phone number
+- **Open source**: Fully auditable code
 
-### Why PWA Over Extension?
+### Example Scenarios
 
-- **WebRTC Native Support**: No service worker sleep issues killing connections
-- **Mobile Support**: Works on phones and tablets (critical for viral growth)
-- **Instant Updates**: Deploy changes immediately, no store approval
-- **Lower Friction**: Share URL vs "install extension" (better for viral mechanics)
-- **Cross-Browser**: Works on Chrome, Firefox, Safari, Edge
-- **PWA Install**: Can still be "installed" to home screen/desktop
-- **SEO**: Next.js enables search engine optimization for organic discovery
+**Two people chatting (Alice and Bob):**
 
-### Honest Limitations
+1. Alice opens GhostChat and creates room "coffee-talk"
+2. Alice texts Bob: "Join me on GhostChat, room: coffee-talk"
+3. Bob opens GhostChat and types "coffee-talk" in the room field
+4. Both are now connected directly (peer-to-peer)
+5. They chat privately - messages go directly between them
+6. When done, both close their tabs
+7. All messages vanish - no history exists anywhere
 
-- **Tab Dependency**: Must keep tab/app open for active connections
-- **Bootstrap Dependency**: Requires Gun relay peers for initial discovery
-- **NAT Traversal**: Direct connections may fail behind strict firewalls (uses free STUN servers)
-- **Cold Start**: Early users need public discovery rooms until network grows
+**Group chat (4 people):**
 
-## Technology Stack
+1. Alice creates room "team-meeting"
+2. Alice shares "team-meeting" with Bob, Carol, and Dave
+3. All 4 people join the same room name
+4. Everyone connects to everyone else (mesh network)
+5. Any message sent is seen by all 4 people instantly
+6. When anyone closes their tab, their messages disappear from their device
 
-Next.js setup optimized for SEO, PWA, and free deployment:
+### Limitations
 
-- **Core**: Next.js 15 (App Router) + TypeScript
-  - Static export for PWA deployment
-  - Built-in SEO optimization (meta tags, sitemaps, Open Graph)
-  - Server Components for landing pages
-  - Client Components for P2P chat
-- **P2P Layers**:
-  - **WebRTC**: Direct peer-to-peer connections for real-time messaging
-  - **Gun.js**: Signaling and peer discovery (bootstrap only)
-  - **simple-peer**: WebRTC wrapper for easier connection management
-- **Encryption**: Gun SEA for identity + native WebRTC DTLS/SRTP
-- **NAT Traversal**: Free STUN servers (Google/Mozilla) + optional TURN fallback
-- **UI**: React + PWA APIs (service worker, manifest, notifications)
-- **Storage**: Memory-only (RAM) with auto-clear on close
-- **Deployment**: Static export to Cloudflare Pages (free tier, unlimited bandwidth)
-- **Testing**: Local multi-tab testing with real WebRTC connections
+- Must keep tab open while chatting
+- Both people need to be online at the same time
+- Your friend sees your IP address (use VPN to mask it)
+- Some strict firewalls may block connections
+- **Room name collisions**: If two separate groups use the same room name, they'll all be connected together. Use unique room names to avoid this
 
-### Why Next.js?
-- **SEO**: Meta tags, Open Graph, Twitter Cards (critical for viral growth)
-- **Performance**: Automatic code splitting, image optimization
-- **Free Deployment**: Cloudflare Pages free tier (unlimited bandwidth)
-- **Static Export**: `next build && next export` generates static PWA (no server needed)
-- **Developer Experience**: Fast refresh, TypeScript support, easy routing
+---
 
-### Post-MVP Additions
-- Libp2p for DHT-based discovery (remove Gun.js dependency)
-- NOSTR for decentralized signaling
-- Community TURN servers for strict NAT
-- Browser extension wrapper (optional, for background persistence)
+## For Developers
 
-## Quick Start
+### Quick Start
 
 ```bash
-# Install dependencies
+# Install
 npm install
 
-# Development server
+# Run dev server
 npm run dev
 # Open http://localhost:3000
 
-# Build static export (PWA)
+# Test P2P
+# Tab 1: localhost:3000/chat -> Room: "test"
+# Tab 2: localhost:3000/chat -> Room: "test"
+# Send messages between tabs
+
+# Build for production
 npm run build
-# Generates /out directory
-
-# Deploy to Cloudflare Pages
-npm run deploy
 ```
 
-## Project Structure
+### Tech Stack
+
+- **Next.js 15**: Static export, App Router, TypeScript
+- **WebRTC**: Direct P2P connections (simple-peer)
+- **Gun.js**: Signaling for peer discovery
+- **React**: UI components
+- **PWA**: Installable app (requires internet for P2P connections)
+
+### Architecture
+
+**How P2P Works**:
+
+1. **User joins room** → Gun.js announces presence
+2. **Peer discovery** → Gun.js exchanges WebRTC signals
+3. **Direct connection** → WebRTC establishes P2P link
+4. **Messages flow** → Direct peer-to-peer (Gun.js not involved)
+5. **Tab closes** → Everything wiped from memory
+
+**Key Components**:
 
 ```
-privypeer/
-├── app/
-│   ├── layout.tsx           # Root layout with SEO meta tags
-│   ├── page.tsx             # Landing page (Server Component)
-│   ├── chat/
-│   │   └── page.tsx         # Chat page (Client Component)
-│   ├── invite/[id]/
-│   │   └── page.tsx         # Invite page with dynamic OG images
-│   └── api/                 # API routes (optional)
-├── components/              # React components
-│   ├── ChatCore.tsx         # Messaging interface (Client)
-│   ├── InviteHub.tsx        # Invite generation UI
-│   ├── DiscoveryRoom.tsx    # Public room for cold start
-│   └── InstallPrompt.tsx    # PWA install banner
-├── lib/                     # Core logic
-│   ├── webrtc.ts            # WebRTC peer connection management
-│   ├── signaling.ts         # Gun.js signaling for peer discovery
-│   ├── crypto.ts            # E2E encryption (Gun SEA + WebRTC)
-│   ├── identity.ts          # Key management and backup
-│   ├── propagation.ts       # Share tracking and rewards
-│   ├── storage.ts           # Memory-only storage
-│   └── rateLimit.ts         # Spam prevention
-├── public/
-│   ├── manifest.json        # PWA manifest
-│   ├── sw.js                # Service worker
-│   └── icons/               # PWA icons (192x192, 512x512)
-├── next.config.js           # Next.js config (static export)
-├── tsconfig.json
-└── package.json
+lib/
+├── webrtc.ts       # WebRTC peer management
+├── signaling.ts    # Gun.js signaling
+├── storage.ts      # Memory-only storage
+└── identity.ts     # Ephemeral identity
+
+components/
+└── ChatCore.tsx    # Main chat UI
+
+app/
+├── page.tsx        # Landing page
+└── chat/page.tsx   # Chat interface
 ```
-
-## Roadmap
-
-### Phase 1: Foundation (Week 1)
-- Next.js setup with static export
-- Landing page with SEO optimization (meta tags, Open Graph)
-- PWA manifest and service worker
-- Gun.js setup with community relay peers
-- Basic chat UI (local only, no P2P yet)
-- Ephemeral identity generation (random per session)
-- Memory-only message storage
-- Privacy UI (blur on inactive, auto-clear)
-
-### Phase 2: P2P Core (Weeks 2-3)
-- WebRTC peer connection setup with simple-peer
-- Gun.js signaling for offer/answer exchange
-- STUN server integration for NAT traversal
-- Direct P2P messaging over WebRTC data channels
-- Multi-tab testing (2-3 real peers with direct connections)
-- Rate limiting and spam prevention
-
-### Phase 3: Viral Features (Week 4-5)
-- Invite link generation with QR codes
-- Dynamic OG images for invite pages (SEO)
-- Local propagation tracking (share counter)
-- Public discovery room for cold start
-- Basic badge system (5+ shares unlock)
-- Web Share API integration
-- PWA notifications for new messages
-
-### Phase 4: Polish & Deploy (Week 6)
-- UI refinements and error handling
-- Key backup/recovery flow
-- Deploy to Cloudflare Pages
-- Custom domain setup
-- Mobile testing and optimization
-- SEO audit and optimization
-
-**Realistic Target**: Functional MVP by Week 6-8
-
-## Architecture
-
-**True P2P Model**: Direct WebRTC connections with Gun.js for signaling only.
-
-**Flow**: 
-1. User visits URL → Next.js PWA loads → Generates identity keypair (local only)
-2. Connects to Gun relay for signaling (temporary, bootstrap only)
-3. Joins public discovery room OR uses invite link
-4. Exchanges WebRTC offer/answer via Gun signaling
-5. Establishes direct P2P connection via WebRTC data channel
-6. Messages flow peer-to-peer (no relay involvement after connection)
-7. Share tracking unlocks features locally
-8. Optional: Install PWA to home screen/desktop
 
 **Data Flow**:
-- **Signaling Phase**: Gun relay used only for WebRTC offer/answer/ICE exchange
-- **Messaging Phase**: Direct P2P via WebRTC data channels (E2E encrypted)
-- **Identity**: Random peer ID per session (no persistent identity)
-- **Message Storage**: Memory-only (RAM), auto-cleared when tab closes
-- **Peer Discovery**: Gun relay for initial handshake, then direct connections
-- **NAT Traversal**: STUN servers reveal public IP, TURN fallback if needed
 
-**Infrastructure Needs**:
-- Static hosting (Cloudflare Pages - free tier, unlimited bandwidth)
-- Community-run Gun relay peers (signaling only, minimal bandwidth)
-- Public STUN servers (Google/Mozilla free tier)
-- Optional TURN servers for ~15-20% of users behind symmetric NAT
+- **Signaling**: Gun.js relay (WebRTC offer/answer only)
+- **Messages**: Direct P2P via WebRTC data channels
+- **Storage**: RAM only, no disk writes
+- **Identity**: Random UUID per session
+- **Encryption**: WebRTC native (DTLS/SRTP)
 
-**Why This Works**:
-- Gun.js handles the hard part (signaling/discovery) without seeing messages
-- WebRTC provides true P2P connections with native encryption
-- After connection, peers communicate directly (no relay in message path)
-- Memory-only storage leaves zero disk traces
-- Ephemeral identities prevent cross-session tracking
-- Next.js SEO enables organic discovery
-- PWA works on all devices, increasing viral potential
-- Static hosting = zero server costs
+**Infrastructure**:
+
+- Static hosting (Cloudflare Pages - free)
+- Community Gun.js relays (signaling only)
+- Public STUN servers (Google/Mozilla - free)
+- No backend servers needed
+
+### Project Structure
+
+```
+app/
+├── layout.tsx          # Root layout + SEO
+├── globals.css         # Global styles
+├── page.tsx            # Landing page
+└── chat/page.tsx       # Chat page
+
+components/
+└── ChatCore.tsx        # Chat UI + P2P logic
+
+lib/
+├── webrtc.ts           # WebRTC connections
+├── signaling.ts        # Gun.js signaling
+├── storage.ts          # Memory storage
+├── identity.ts         # Ephemeral IDs
+└── propagation.ts      # Share tracking
+
+public/
+├── manifest.json       # PWA manifest
+├── sw.js               # Service worker
+└── icon-*.png          # PWA icons
+```
+
+### Development
+
+**Local Testing**:
+```bash
+# Terminal
+npm run dev
+
+# Browser Tab 1
+localhost:3000/chat -> Room: "test123"
+
+# Browser Tab 2
+localhost:3000/chat -> Room: "test123"
+
+# Send messages - they sync via WebRTC
+```
+
+**Multi-Device Testing**:
+```bash
+# Get local IP
+ifconfig | grep "inet " | grep -v 127.0.0.1
+
+# Desktop: http://localhost:3000/chat
+# Mobile: http://YOUR_IP:3000/chat
+# Both join same room
+```
+
+**Debug WebRTC**:
+```javascript
+// Browser console
+localStorage.debug = 'simple-peer'
+// Reload page
+```
+
+### Deployment
+
+**Cloudflare Pages**:
+```bash
+npm run build
+wrangler pages deploy out
+```
+
+**GitHub Pages**:
+```bash
+npm run build
+gh-pages -d out
+```
+
+**Any Static Host**:
+```bash
+npm run build
+# Upload /out directory
+```
 
 ## Development
 
@@ -267,8 +314,8 @@ npm run build
 
 # Community self-hosting (Docker)
 npm run build
-docker build -t privypeer .
-docker run -p 80:80 privypeer
+docker build -t ghostchat .
+docker run -p 80:80 ghostchat
 ```
 
 ## Core Concepts
@@ -361,8 +408,8 @@ One-tap invite creation with QR codes and Web Share API:
 
 // Share via Web Share API (mobile-friendly)
 await navigator.share({
-  title: 'Join me on PrivyPeer',
-  url: 'https://privypeer.app/invite/abc123'
+  title: 'Join me on GhostChat',
+  url: 'https://ghostchat.app/invite/abc123'
 });
 ```
 
@@ -420,270 +467,75 @@ We welcome contributions! This is a community-driven project focused on privacy 
 ### Deployment
 
 **Primary Distribution**: Web URL (PWA)
-- Deploy to: `privypeer.app` (or similar short domain)
-- Hosting: **Cloudflare Pages** (free tier, unlimited bandwidth)
-- Built with: Next.js static export (SEO optimized)
-- Updates: Instant (no app store approval)
+- Deploy to: `ghostchat.app` (or similar short domain)
+- Hosting: **Cloudflare Pages** (free tier, unlimited ### Security
 
-**Why Cloudflare Pages?**
-- Unlimited bandwidth (truly free forever)
-- Unlimited requests (no function invocation limits)
-- Global CDN (300+ cities)
-- Free custom domains + SSL
-- Automatic deployments from Git
-- Built-in analytics (privacy-friendly)
-- DDoS protection included
-- Zero cost at any scale
+- **Encryption**: WebRTC native (DTLS/SRTP)
+- **No persistence**: Messages in RAM only
+- **Ephemeral**: New identity each session
+- **Open source**: Fully auditable
+- **No tracking**: Zero analytics or logs
 
-**Primary Hosting** (Free, Fast, Scalable):
+### Troubleshooting
 
-- **Cloudflare Pages**:
-  - Unlimited bandwidth and requests
-  - Deploy: `wrangler pages deploy out`
-  - Custom domain: `privypeer.app` via Cloudflare DNS
-  - Cost: $0 at any scale (even millions of users)
-  - SEO: Next.js meta tags, Open Graph, sitemaps
-  - Limitation: Can be taken down by Cloudflare ToS
+**Messages not syncing?**
+- Check both users joined same room ID
+- Check browser console for errors
+- Try different room name
 
-**Censorship-Resistant Backup** (If Primary Goes Down):
+**Connection failed?**
+- Check firewall settings
+- Try different network
+- Some corporate networks block WebRTC
 
-- **Tor Hidden Service**:
-  - Deploy: nginx + Tor on any server
-  - Access: `xxxxxxxxxxxxx.onion`
-  - Cost: $0 (self-host or free VPS)
-  - Can't be censored, blocked, or traced
-  - Community can run multiple mirrors
+**Icons not loading?**
+- Clear browser cache
+- Restart dev server
 
-**Why This Works**:
-- Primary (Cloudflare Pages): Fast, free, 99.9% uptime, SEO optimized
-- Backup (Tor): Unstoppable, anonymous, censorship-proof
-- Open source: Community can always re-host
-- Static PWA: Easy to deploy anywhere
-
-### Viral Distribution Mechanics
-
-**1. Share-to-Unlock**
-```typescript
-// Progressive feature unlocks
-0 shares → Basic chat only
-1 share → Custom themes
-3 shares → Voice messages  
-5 shares → Group chats
-10 shares → Priority connections
-```
-
-**2. Invite Links**
-- Short URLs: `privypeer.app/i/x7k2` (easy to share)
-- QR codes: Instant mobile sharing
-- Deep links: Open directly in PWA if installed
-- Dynamic OG images: Preview cards on social media
-- Expiry: 24 hours (creates urgency)
-
-**3. Web Share API**
-```typescript
-// One-tap sharing on mobile
-await navigator.share({
-  title: 'Chat with me privately',
-  text: 'Join me on PrivyPeer - truly private P2P chat',
-  url: 'https://privypeer.app/i/x7k2'
-});
-```
-
-**4. Post-Chat Prompts**
-- After 10 messages: "Enjoying the chat? Invite a friend!"
-- After 1 hour: "Share PrivyPeer to unlock group chats"
-- Non-intrusive, value-driven prompts
-
-### Growth Strategy
-
-**Phase 1: Seed (Week 1-2)** - Target: 100 users
-- Reddit: r/privacy, r/selfhosted, r/opensource
-- Hacker News: Show HN post
-- Product Hunt: Launch day
-- Twitter/X: Privacy tech community
-
-**Phase 2: Early Adopters (Week 3-8)** - Target: 1K users
-- Word of mouth from seed users
-- Share-to-unlock drives 1:0.5 ratio (50 shares per 100 users)
-- Public discovery room for cold start
-- Community-run Gun relays
-- SEO: Organic search traffic from Next.js optimization
-
-**Phase 3: Viral Growth (Month 3-6)** - Target: 10K+ users
-- Network effects kick in
-- Mobile sharing (PWA on phones)
-- Organic social media mentions
-- Privacy news coverage
-- Search engine visibility
-
-**Realistic Projections**:
-- Week 1: 100 users (manual seeding)
-- Month 1: 500 users (1:0.5 share ratio)
-- Month 3: 2K users (compounding + SEO)
-- Month 6: 10K users (viral threshold)
-
-### Marketing Angles
-
-**Privacy-First Messaging**:
-- "Messages disappear when you close the tab"
-- "No servers, no tracking, no data breaches"
-- "True P2P - your messages never touch our servers"
-- "Ephemeral by design - like real conversations"
-
-**Comparison Positioning**:
-- vs Signal: "No phone numbers, no central servers"
-- vs WhatsApp: "No Meta, no data collection"
-- vs Telegram: "True P2P, not client-server"
-- vs Discord: "No permanent history, maximum privacy"
-
-**Target Communities**:
-- Privacy enthusiasts (Reddit, HN)
-- Crypto/Web3 users (decentralization appeal)
-- Activists/journalists (censorship resistance)
-- Tech early adopters (novel P2P tech)
-
-### Distribution Channels
-
-**Owned**:
-- Website: `privypeer.app`
-- GitHub: Open source repo
-- Documentation: Comprehensive guides
-
-**Earned**:
-- Reddit posts (organic discussions)
-- HN front page (Show HN)
-- Tech blogs (privacy-focused)
-- YouTube reviews (tech channels)
-- Search engines (Next.js SEO)
-
-**Viral**:
-- Invite links (primary growth driver)
-- Web Share API (mobile sharing)
-- QR codes (in-person sharing)
-- Social proof ("1K+ users chatting privately")
-
-### Risk Mitigation
-
-**Technical Risks**:
-- Gun relay downtime → Deploy backup relays
-- NAT traversal failures → TURN server fallback
-- Hosting costs → Cloudflare Pages = free forever
-- Bandwidth limits → None (Cloudflare Pages has no limits)
-- Censorship → Tor backup + community mirrors (unstoppable)
-- Takedown requests → Open source = community can always re-host
-
-**Growth Risks**:
-- Slow adoption → Aggressive share-to-unlock + SEO
-- Spam perception → Rate limit shares (max 5/day)
-- Cold start problem → Public discovery room
-
-**Legal/Policy Risks**:
-- No app stores → No rejection risk
-- No user data → No GDPR concerns
-- Open source → Community can fork
-
-### Success Metrics
-
-**Week 1-4**:
-- 100+ active users
-- 50+ shares generated
-- 10+ community relay hosts
-
-**Month 3-6**:
-- 1K+ daily active users
-- 0.5+ share ratio sustained
-- 100+ concurrent P2P connections
-- Featured on privacy blogs
-- Organic search traffic
-
-**Month 6-12**:
-- 10K+ total users
-- Self-sustaining viral growth
-- Community-driven development
-- Multiple language support
-
-## Inspiration
-
-- Signal's invite system
-- BeReal's social loops
-- Briar's P2P resilience
-
-## Known Limitations
-
-- **Tab Dependency**: Must keep tab/app open for active connections (PWA helps with persistence)
-- **NAT Traversal**: ~15-20% of users behind symmetric NAT need TURN servers (costs money at scale)
-- **Signaling Dependency**: Requires Gun relay for initial peer discovery (but not for messaging)
-- **Connection Limits**: Browser limits ~256 simultaneous WebRTC connections per tab
-- **IP Exposure**: Peers see each other's IP addresses (true P2P tradeoff)
-- **Battery Impact**: Active P2P connections may drain mobile battery faster
+---
 
 ## License
 
-MIT License (open source, permissive)
+MIT License - Open source and free forever
 
-## Roadmap Beyond MVP
+## FAQ
 
-- Voice/video calls (WebRTC already supports it)
-- File sharing via WebRTC data channels
-- Group chats (mesh network)
-- Desktop app wrapper (Electron/Tauri)
-- Browser extension wrapper (optional background persistence)
-- Advanced privacy dashboard
-- Community moderation tools
+**Is this truly P2P?**  
+Yes. Messages go directly between users via WebRTC. Gun.js relay only helps you find each other.
+
+**Can the relay see my messages?**  
+No. Relay only handles connection setup. Messages are encrypted and go directly peer-to-peer.
+
+**Are messages saved?**  
+No. Everything is stored in RAM only and wiped when you close the tab.
+
+**Do I need an account?**  
+No. No signup, no phone number, no email. Just open and chat.
+
+**Does it work on mobile?**  
+Yes. Works on any modern browser. Can be installed as PWA.
+
+**What if I close the tab?**  
+Everything disappears: messages, identity, connections. Fresh start next time.
+
+**Can someone recover my messages?**  
+No. Memory-only storage means zero disk traces.
+
+**Why not use Signal/WhatsApp?**  
+GhostChat has no central servers, no phone numbers, no persistent identity. Messages truly disappear.
+
+**Can my friend see my IP address?**  
+Yes, that's how P2P works. Use a VPN to mask your IP if needed.
+
+**Can multiple people join the same room?**  
+Yes! Any number of people can join the same room name. Everyone in the room will be connected to each other (mesh network). All participants see all messages in real-time.
+
+**What if two groups accidentally use the same room name?**  
+All 4 people will be connected together in one big group chat. If Alice and Bob join room "meeting" at the same time Jack and Jessica also join room "meeting", all 4 will see each other's messages. To avoid this, use unique room names (e.g., "alice-bob-jan15" instead of generic names like "meeting" or "chat").
 
 ---
 
 **Status**: Pre-MVP Development  
-**Realistic Timeline**: 6-8 weeks to functional MVP  
-**Deployment**: Cloudflare Pages (primary) + Tor (backup)  
-**Distribution**: Web URL (PWA) - no app stores needed  
-**Growth Model**: Viral sharing + SEO with 1:0.5 ratio target  
-**Censorship Resistance**: Decentralized hosting, unstoppable  
-**Community**: [Coming Soon]
-
-## FAQ
-
-**Q: Is this truly P2P?**  
-A: Yes. After initial signaling via Gun relay, messages flow directly peer-to-peer via WebRTC. The relay never sees message content.
-
-**Q: What if all Gun relays go down?**  
-A: Existing connections stay active (direct P2P). New connections can't be established until relays return. Community can host their own relays.
-
-**Q: Can the relay see my messages?**  
-A: No. Relay only handles WebRTC signaling (offer/answer exchange). Messages go directly between peers over encrypted WebRTC channels.
-
-**Q: How do I backup my identity?**  
-A: You don't. Identity is ephemeral (new per session) for maximum privacy. No persistent identity to backup or lose.
-
-**Q: Why not use Signal/Matrix instead?**  
-A: PrivyPeer has no central authority, no phone numbers, and viral sharing mechanics built-in.
-
-**Q: Does it work on mobile?**  
-A: Yes! PWA works on all modern mobile browsers. Install to home screen for app-like experience.
-
-**Q: Do I need to keep the tab open?**  
-A: Yes, for active connections. Installing as PWA helps with persistence. Future extension wrapper will add background support.
-
-**Q: How much does it cost to run?**  
-A: Zero. Cloudflare Pages is free forever (unlimited bandwidth), STUN servers are free, Gun relays are community-run.
-
-**Q: What if Cloudflare Pages goes down?**  
-A: Tor backup is always available. Static PWA can also be hosted on GitHub Pages, any web server, or community mirrors. Open source = unstoppable.
-
-**Q: Can PrivyPeer be censored or taken down?**  
-A: Primary site (Cloudflare Pages) can be taken down. But Tor backup is censorship-proof, and community can re-host anywhere. Static PWA = easy to mirror.
-
-**Q: How much does it cost to run?**  
-A: Cloudflare Pages = $0 forever (unlimited bandwidth). Tor backup = $0 (community-run). No costs at any scale.
-
-**Q: Are messages stored permanently?**  
-A: No. Messages are stored in RAM only and disappear when you close the tab. Zero disk traces.
-
-**Q: Can I export my message history?**  
-A: Yes, you can export current session messages. But they're gone when you close the tab - by design for maximum privacy.
-
-**Q: What happens when I close the tab?**  
-A: Everything is wiped: messages, identity, connections. Fresh start next time. True ephemeral chat.
-
-**Q: Can someone recover my messages from my device?**  
-A: No. Memory-only storage means zero disk traces. Nothing to recover.
+**Built with**: Next.js, WebRTC, Gun.js  
+**Deployment**: Static PWA (Cloudflare Pages)  
+**Cost**: $0 forever (no servers needed)

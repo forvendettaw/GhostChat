@@ -1,0 +1,9 @@
+Please add a ghost icon image (ghost.png or ghost.jpg) to the assets/ folder.
+
+You can:
+1. Download a ghost icon from https://www.flaticon.com or similar
+2. Use an emoji-to-image converter for the ghost emoji (👻)
+3. Create a custom ghost icon
+
+Recommended size: 512x512px
+Format: PNG with transparency or JPG
