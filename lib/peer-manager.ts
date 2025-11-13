@@ -1,5 +1,7 @@
 import Peer, { DataConnection } from 'peerjs';
 import { getTURNServers } from './turn-config';
+import { compressAsync, decompressAsync } from './compression';
+import { trackSent, trackReceived } from './bandwidth-monitor';
 
 let peer: Peer | null = null;
 const connections = new Map<string, DataConnection>();
@@ -57,8 +59,11 @@ export function initPeer(roomId: string, onMessage: (peerId: string, data: strin
 function setupConnection(conn: DataConnection, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void) {
   connections.set(conn.peer, conn);
   
-  conn.on('data', (data) => {
-    onMessage(conn.peer, data as string);
+  conn.on('data', async (data) => {
+    const raw = data as string;
+    trackReceived(raw.length);
+    const text = await decompressAsync(raw);
+    onMessage(conn.peer, text);
   });
 
   conn.on('open', () => {
@@ -75,6 +80,10 @@ function setupConnection(conn: DataConnection, onMessage: (peerId: string, data:
 
 export function connectToPeer(remotePeerId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void, retryCount = 0) {
   if (!peer) return;
+  if (connections.has(remotePeerId)) {
+    console.log('[PEER] Already connected to:', remotePeerId);
+    return;
+  }
   
   const conn = peer.connect(remotePeerId);
   
@@ -100,9 +109,11 @@ export function sendToPeer(peerId: string, data: string) {
   }
 }
 
-export function sendToAll(data: string) {
+export async function sendToAll(data: string) {
+  const compressed = await compressAsync(data);
+  trackSent(compressed.length);
   connections.forEach((conn) => {
-    if (conn.open) conn.send(data);
+    if (conn.open) conn.send(compressed);
   });
 }
 
@@ -115,6 +126,14 @@ export function destroy() {
   connections.clear();
   peer?.destroy();
   peer = null;
+}
+
+export function getConnectionCount(): number {
+  return connections.size;
+}
+
+export function getConnections(): string[] {
+  return Array.from(connections.keys());
 }
 
 export function setPeerJSConfig(host: string, port: number, path: string) {

@@ -59,24 +59,18 @@
 
 ---
 
-## Phase 3: PeerJS Cloud API (Week 5-6)
+## Phase 3: Signaling & Performance (Week 5-6)
 
-### 📋 Planned
-- [ ] **PeerJS Cloud API Key Support**
-  - Free API key registration guide
-  - BYOK (Bring Your Own Key) configuration
-  - Rate limit handling
-  - **Estimated**: 1-2 days
-
-- [ ] **Performance Optimizations**
-  - Message compression
-  - Bandwidth adaptation
-  - Connection pooling
-  - **Estimated**: 3-4 days
+### ✅ Completed
+- [x] Cloudflare Workers signaling server
+- [x] Message compression (gzip)
+- [x] Bandwidth monitoring
+- [x] Connection pooling (duplicate prevention)
+- [x] Custom server configuration UI
 
 ---
 
-## Phase 4: Production Deployment (Week 7-8)
+## Phase 4: Security & Monitoring (Week 7-8)
 
 ### 📋 Planned
 - [ ] **Monitoring & Analytics**
