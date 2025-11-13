@@ -15,6 +15,9 @@ All notable changes to GhostChat will be documented in this file.
 - White message bubbles for sent messages
 - Step-by-step footer instructions on pre-join screen
 - Clipboard fallback for non-HTTPS contexts
+- **Custom PeerJS server configuration** (Settings UI)
+- Support for self-hosted signaling servers
+- CUSTOM-SERVER.md documentation
 
 ### Changed
 - Replaced Gun.js with PeerJS for simpler, more reliable P2P

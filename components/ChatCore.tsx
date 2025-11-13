@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getMessages, storeMessage } from "@/lib/storage";
 import { initPeer, connectToPeer, sendToAll, destroy } from "@/lib/peer-manager";
+import Settings from "./Settings";
 
 interface ChatCoreProps {
   invitePeerId: string | null;
@@ -24,6 +25,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [showInvite, setShowInvite] = useState(false);
   const [linkCreated, setLinkCreated] = useState(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     const handleMessage = (fromPeerId: string, data: string) => {
@@ -93,10 +95,30 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: 16, borderBottom: "1px solid #333" }}>
-        <div style={{ fontSize: 12, opacity: 0.6 }}>
-          Your ID: {peerId.slice(0, 8)}...
+      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
+      <div style={{ padding: 16, borderBottom: "1px solid #333", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <div style={{ fontSize: 12, opacity: 0.6 }}>
+            Your ID: {peerId.slice(0, 8)}...
+          </div>
         </div>
+        <button
+          onClick={() => setShowSettings(true)}
+          style={{
+            padding: '4px 8px',
+            background: '#333',
+            border: 'none',
+            borderRadius: 6,
+            color: '#fff',
+            fontSize: 10,
+            cursor: 'pointer',
+            opacity: 0.7
+          }}
+        >
+          Settings
+        </button>
+      </div>
+      <div style={{ padding: "0 16px 16px" }}>
         <div style={{ fontSize: 10, marginTop: 4, color: connected ? '#0f0' : connecting ? '#ff0' : '#f00' }}>
           {connected ? "✓ Connected" : connecting ? "Establishing connection..." : "✗ Disconnected"}
         </div>

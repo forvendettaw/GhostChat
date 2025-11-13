@@ -58,6 +58,7 @@ GhostChat is a truly private chat app where messages travel directly between you
 - **Auto-blur**: Screen blurs when you switch tabs
 - **No accounts**: No signup, no phone number, no email
 - **Works everywhere**: Desktop, mobile, any browser
+- **Decentralized**: Use your own PeerJS server (optional)
 
 ### Privacy Guarantees
 
@@ -93,6 +94,24 @@ Currently, GhostChat supports one-to-one conversations. Each invite link connect
 - Some strict firewalls may block connections
 - **Invite links expire**: Links only work while the creator's tab is open
 - **One-to-one only**: Currently supports 2 people per room (group chat coming soon)
+
+---
+
+### Custom Server (Optional)
+
+For true decentralization, you can configure your own PeerJS signaling server:
+
+1. Click "Settings" button in the chat interface
+2. Enter your server details (host, port, path, API key)
+3. Save and reload
+
+See [CUSTOM-SERVER.md](CUSTOM-SERVER.md) for detailed instructions on:
+- Self-hosting PeerJS server
+- Using community servers
+- Deployment guides
+- Cost estimates
+
+**Default**: Uses free PeerJS cloud server (0.peerjs.com) - no configuration needed.
 
 ---
 
