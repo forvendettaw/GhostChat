@@ -55,9 +55,9 @@ describe("ChatCore", () => {
     render(<ChatCore invitePeerId={null} />);
     await waitFor(
       () => {
-        expect(screen.getByText("Create Invite Link")).toBeInTheDocument();
+        expect(screen.getByText(/Create Invite Link/i)).toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 3000 },
     );
   });
 

@@ -11,12 +11,6 @@ vi.mock("@/lib/peer-manager", () => ({
   connectToPeer: vi.fn(),
   sendToAll: vi.fn(),
   destroy: vi.fn(),
-  getPeerId: vi.fn(() => "test-peer-id"),
-}));
-
-vi.mock("@/lib/storage", () => ({
-  getMessages: vi.fn(() => []),
-  storeMessage: vi.fn(),
 }));
 
 vi.mock("@/lib/invite-manager", () => ({
@@ -53,12 +47,9 @@ describe("ChatCore", () => {
 
   it("shows create invite button when no peer connected", async () => {
     render(<ChatCore invitePeerId={null} />);
-    await waitFor(
-      () => {
-        expect(screen.getByText("Create Invite Link")).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
+    await waitFor(() => {
+      expect(screen.getByText(/Create Invite Link/i)).toBeInTheDocument();
+    });
   });
 
   it("shows disconnected status initially", () => {

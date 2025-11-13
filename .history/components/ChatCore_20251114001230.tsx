@@ -17,9 +17,6 @@ import {
 } from "@/lib/mobile-utils";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { validateMessage } from "@/lib/input-validation";
-import { generateQRCode } from "@/lib/qr-code";
-import { getConnectionErrorMessage } from "@/lib/error-messages";
-import { saveSession, getSession, clearSession } from "@/lib/session-recovery";
 import Settings from "./Settings";
 import ErrorHandler from "./ErrorHandler";
 import Diagnostics from "./Diagnostics";
@@ -47,7 +44,6 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     if (isMobile()) {
@@ -74,7 +70,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       console.log("[CHAT] Connection lost");
       setConnected(false);
       setConnecting(false);
-      setError(getConnectionErrorMessage({ type: 'disconnected' }));
+      setError("Connection lost. Your friend may have closed their tab.");
     };
 
     const peer = initPeer("", handleMessage, handleConnect, handleDisconnect);
@@ -82,7 +78,6 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     peer.on("open", (id) => {
       console.log("[PEER] My ID:", id);
       setPeerId(id);
-      saveSession(id);
       const link = `${window.location.origin}/chat?peer=${id}`;
       setInviteLink(link);
 
@@ -116,14 +111,8 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    peer.on('error', (err) => {
-      console.error('[PEER] Error:', err);
-      setError(getConnectionErrorMessage(err));
-    });
-
     return () => {
       destroy();
-      clearSession();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [invitePeerId]);
@@ -267,33 +256,8 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
                 >
                   {inviteLink}
                 </div>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <button
-                    onClick={() => setShowQR(!showQR)}
-                    style={{
-                      padding: '4px 8px',
-                      background: '#333',
-                      border: 'none',
-                      borderRadius: 6,
-                      color: '#fff',
-                      fontSize: 10,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {showQR ? 'Hide QR' : 'Show QR Code'}
-                  </button>
-                </div>
-                {showQR && (
-                  <div style={{ textAlign: 'center', marginBottom: 8 }}>
-                    <img
-                      src={generateQRCode(inviteLink)}
-                      alt="QR Code"
-                      style={{ maxWidth: '200px', border: '2px solid #333', borderRadius: 8 }}
-                    />
-                  </div>
-                )}
                 <div style={{ opacity: 0.6, fontSize: 10 }}>
-                  They paste it in their browser or scan QR code
+                  They paste it in their browser address bar and press Enter
                 </div>
                 <div
                   style={{
