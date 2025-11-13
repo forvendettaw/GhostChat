@@ -199,11 +199,9 @@ components/
 └── ChatCore.tsx        # Chat UI + P2P logic
 
 lib/
-├── webrtc.ts           # WebRTC connections
-├── signaling.ts        # Gun.js signaling
+├── peer-manager.ts     # PeerJS P2P connections
 ├── storage.ts          # Memory storage
-├── identity.ts         # Ephemeral IDs
-└── propagation.ts      # Share tracking
+└── identity.ts         # Ephemeral IDs
 
 public/
 ├── manifest.json       # PWA manifest
@@ -452,7 +450,7 @@ window.addEventListener('appinstalled', () => {
 
 - **True P2P**: Messages sent directly between peers via WebRTC (no relay in path)
 - **E2E Encryption**: WebRTC native DTLS/SRTP encryption
-- **Signaling Privacy**: Gun relay only sees connection metadata, never messages
+- **Signaling Privacy**: PeerJS server only sees connection metadata, never messages
 - **Memory-Only**: Messages stored in RAM only, zero disk traces
 - **Ephemeral Identity**: Random peer ID per session, no persistent tracking
 - **Auto-Clear**: All data wiped when tab closes
@@ -463,7 +461,7 @@ window.addEventListener('appinstalled', () => {
 
 ### Security Considerations
 
-- **Signaling Trust**: Gun relay sees who connects to whom (but not message content)
+- **Signaling Trust**: PeerJS server sees who connects to whom (but not message content)
 - **Metadata Leakage**: Connection timing/patterns visible during signaling phase
 - **IP Exposure**: Peers learn each other's IP addresses (inherent to P2P)
 - **Spam Risk**: Rate limiting on signaling phase prevents connection flooding
@@ -519,10 +517,10 @@ MIT License - Open source and free forever
 ## FAQ
 
 **Is this truly P2P?**  
-Yes. Messages go directly between users via WebRTC. Gun.js relay only helps you find each other.
+Yes. Messages go directly between users via WebRTC. PeerJS signaling server only helps you find each other.
 
-**Can the relay see my messages?**  
-No. Relay only handles connection setup. Messages are encrypted and go directly peer-to-peer.
+**Can the signaling server see my messages?**  
+No. Signaling server only handles connection setup. Messages are encrypted and go directly peer-to-peer.
 
 **Are messages saved?**  
 No. Everything is stored in RAM only and wiped when you close the tab.
@@ -554,6 +552,6 @@ All 4 people will be connected together in one big group chat. If Alice and Bob 
 ---
 
 **Status**: Pre-MVP Development  
-**Built with**: Next.js, WebRTC, Gun.js  
+**Built with**: Next.js, WebRTC, PeerJS  
 **Deployment**: Static PWA (Cloudflare Pages)  
 **Cost**: $0 forever (no servers needed)
