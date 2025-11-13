@@ -2,7 +2,13 @@
 
 All notable changes to GhostChat will be documented in this file.
 
-## [Unreleased] - 2025-01-13
+## [Unreleased] - 2025-01-13 (Alpha)
+
+### Status
+- **Alpha Release**: Functional but not production-ready
+- **Connection Success**: 60-70% across different networks
+- **Best Use**: Testing, same-network scenarios
+- **Known Issues**: Invite expiration, TURN reliability, corporate firewall blocks
 
 ### Added
 - Invite link system replacing room names for P2P connections
@@ -73,11 +79,15 @@ All notable changes to GhostChat will be documented in this file.
 - Deployment instructions
 
 ### Known Limitations
+- **Invite links expire when creator closes tab** (by design)
+- **Connection reliability varies** (60-70% cross-network success)
+- **Free TURN servers** may be rate-limited or unreliable
+- **Corporate/mobile networks** may block WebRTC
 - Must keep tab open while chatting
 - Both users must be online simultaneously
 - IP addresses visible to peers (P2P nature)
-- Room name collisions possible (users warned in UI)
 - Some firewalls may block WebRTC connections
+- **Alpha status**: Not recommended for production use
 
 ## [0.1.0] - Initial Development
 

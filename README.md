@@ -88,12 +88,15 @@ Currently, GhostChat supports one-to-one conversations. Each invite link connect
 
 ### Limitations
 
+- **Invite links expire**: Links only work while the creator's tab is open
+- **Connection reliability**: 60-70% success rate across different networks
+- **Corporate firewalls**: May block WebRTC connections
+- **Free TURN servers**: May be rate-limited or unreliable
 - Must keep tab open while chatting
 - Both people need to be online at the same time
 - Your friend sees your IP address (use VPN to mask it)
-- Some strict firewalls may block connections
-- **Invite links expire**: Links only work while the creator's tab is open
 - **One-to-one only**: Currently supports 2 people per room (group chat coming soon)
+- **Alpha status**: Not production-ready, best for testing
 
 ---
 
@@ -551,7 +554,14 @@ All 4 people will be connected together in one big group chat. If Alice and Bob 
 
 ---
 
-**Status**: Pre-MVP Development  
+**Status**: Alpha - Not Production Ready  
 **Built with**: Next.js, WebRTC, PeerJS  
 **Deployment**: Static PWA (Cloudflare Pages)  
 **Cost**: $0 forever (no servers needed)
+
+**⚠️ Alpha Limitations**:
+- Invite links expire when creator closes tab
+- Connection success varies by network (60-70% cross-network)
+- Free TURN servers may be rate-limited
+- Best for same-network or testing scenarios
+- Not recommended for production use yet

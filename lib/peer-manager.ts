@@ -83,10 +83,23 @@ function setupConnection(conn: DataConnection, onMessage: (peerId: string, data:
   });
 }
 
-export function connectToPeer(remotePeerId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void) {
+export function connectToPeer(remotePeerId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void, retryCount = 0) {
   if (!peer) return;
   
   const conn = peer.connect(remotePeerId);
+  
+  const retryTimeout = setTimeout(() => {
+    if (!conn.open && retryCount < 3) {
+      console.log(`[PEER] Retry attempt ${retryCount + 1}/3`);
+      conn.close();
+      connectToPeer(remotePeerId, onMessage, onConnect, onDisconnect, retryCount + 1);
+    }
+  }, 5000 * (retryCount + 1));
+  
+  conn.on('open', () => {
+    clearTimeout(retryTimeout);
+  });
+  
   setupConnection(conn, onMessage, onConnect, onDisconnect);
 }
 

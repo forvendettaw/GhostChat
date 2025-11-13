@@ -159,6 +159,9 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
                 <div style={{ opacity: 0.6, fontSize: 10 }}>
                   They paste it in their browser address bar and press Enter
                 </div>
+                <div style={{ opacity: 0.5, fontSize: 9, marginTop: 8, color: '#ff0' }}>
+                  ⚠️ Link expires when you close this tab
+                </div>
               </div>
             )}
           </div>
