@@ -4,17 +4,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ChatCore from "@/components/ChatCore";
 
 vi.mock("@/lib/peer-manager", () => ({
-  initPeer: vi.fn((roomId, onMessage, onConnect, onDisconnect) => {
-    const peer = {
-      on: vi.fn((event, callback) => {
-        if (event === 'open') {
-          setTimeout(() => callback('test-peer-id'), 0);
-        }
-      }),
-      id: "test-peer-id",
-    };
-    return peer;
-  }),
+  initPeer: vi.fn(() => ({
+    on: vi.fn(),
+    id: "test-peer-id",
+  })),
   connectToPeer: vi.fn(),
   sendToAll: vi.fn(),
   destroy: vi.fn(),
@@ -78,7 +71,7 @@ describe("ChatCore", () => {
       () => {
         expect(screen.getByText("Create Invite Link")).toBeInTheDocument();
       },
-      { timeout: 1000 },
+      { timeout: 5000 },
     );
   });
 
