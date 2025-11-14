@@ -22,17 +22,14 @@ const TURN_PROVIDERS: TURNProvider[] = [
 
 export function getTURNServers(): RTCIceServer[] {
   const servers: RTCIceServer[] = [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' }
+    { urls: 'stun:stun.l.google.com:19302' }
   ];
 
-  TURN_PROVIDERS.sort((a, b) => a.priority - b.priority).forEach(provider => {
-    servers.push({
-      urls: provider.urls,
-      username: provider.username,
-      credential: provider.credential
-    });
+  const topProvider = TURN_PROVIDERS.sort((a, b) => a.priority - b.priority)[0];
+  servers.push({
+    urls: topProvider.urls,
+    username: topProvider.username,
+    credential: topProvider.credential
   });
 
   if (typeof window !== 'undefined') {

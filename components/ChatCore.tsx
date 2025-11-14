@@ -51,6 +51,8 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [fallbackWarning, setFallbackWarning] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+    
     (async () => {
     if (isMobile()) {
       ensureHTTPS();
@@ -85,35 +87,25 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
 
     const peer = await initPeer("", handleMessage, handleConnect, handleDisconnect, handleFallback);
 
-    peer.on("open", (id) => {
-      console.log("[PEER] My ID:", id);
-      setPeerId(id);
-      saveSession(id);
-      const link = `${window.location.origin}/chat?peer=${id}`;
+    if (peer && peer.id) {
+      console.log("[CHAT] Peer initialized with ID:", peer.id);
+      setPeerId(peer.id);
+      saveSession(peer.id);
+      const link = `${window.location.origin}/chat?peer=${peer.id}`;
       setInviteLink(link);
 
       if (invitePeerId) {
-        console.log("[PEER] Connecting to invite:", invitePeerId);
+        console.log("[CHAT] Connecting to invite:", invitePeerId);
         setConnecting(true);
-        inviteManager.validateInvite(invitePeerId).then((validPeerId) => {
-          if (validPeerId) {
-            connectToPeer(
-              validPeerId,
-              handleMessage,
-              handleConnect,
-              handleDisconnect,
-            );
-          } else {
-            connectToPeer(
-              invitePeerId,
-              handleMessage,
-              handleConnect,
-              handleDisconnect,
-            );
-          }
-        });
+        const validPeerId = await inviteManager.validateInvite(invitePeerId);
+        connectToPeer(
+          validPeerId || invitePeerId,
+          handleMessage,
+          handleConnect,
+          handleDisconnect,
+        );
       }
-    });
+    }
 
     const handleVisibilityChange = () => {
       document.body.style.filter = document.hidden ? "blur(10px)" : "none";
@@ -126,12 +118,13 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     });
 
     return () => {
+      mounted = false;
       destroy();
       clearSession();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
     })();
-  }, [invitePeerId]);
+  }, []);
 
   const sendMessage = () => {
     if (!input.trim()) return;

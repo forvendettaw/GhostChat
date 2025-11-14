@@ -9,7 +9,7 @@ const connections = new Map<string, DataConnection>();
 const PRIMARY_SERVER = {
   host: 'ghostchat-signaling.teycir.workers.dev',
   port: 443,
-  path: '/peerjs',
+  path: '/',
   secure: true
 };
 
@@ -24,7 +24,7 @@ let usingFallback = false;
 
 async function testServer(config: any): Promise<boolean> {
   try {
-    const url = `https://${config.host}${config.path}/peerjs/id`;
+    const url = `https://${config.host}/peerjs/peerjs/id`;
     const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
     return response.ok;
   } catch {
@@ -56,8 +56,18 @@ async function getPeerConfig() {
   return FALLBACK_SERVER;
 }
 
-export async function initPeer(roomId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void, onFallback?: () => void) {
-  if (peer) return peer;
+let initPromise: Promise<Peer | null> | null = null;
+
+export async function initPeer(roomId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void, onFallback?: () => void): Promise<Peer | null> {
+  if (peer && peer.id) {
+    console.log('[PEER] Already initialized, returning existing peer:', peer.id);
+    return peer;
+  }
+  
+  if (initPromise) {
+    console.log('[PEER] Initialization in progress, waiting...');
+    return initPromise;
+  }
 
   const id = Math.random().toString(36).substr(2, 9);
   const peerConfig = await getPeerConfig();
@@ -66,30 +76,65 @@ export async function initPeer(roomId: string, onMessage: (peerId: string, data:
     onFallback();
   }
   
-  peer = new Peer(id, {
+  console.log('[PEER] Initializing with config:', peerConfig);
+  
+  initPromise = new Promise((resolve, reject) => {
+    const newPeer = new Peer(id, {
     ...peerConfig,
     config: {
       iceServers: getTURNServers()
-    }
+    },
+    debug: 2
   });
 
-  peer.on('connection', (conn) => {
+  newPeer.on('open', (id) => {
+    console.log('[PEER] Peer opened with ID:', id);
+    peer = newPeer;
+    initPromise = null;
+    resolve(peer);
+  });
+  
+  newPeer.on('connection', (conn) => {
     console.log('[PEER] Incoming connection from:', conn.peer);
     setupConnection(conn, onMessage, onConnect, onDisconnect);
   });
 
-  peer.on('error', (err) => {
-    console.error('[PEER] Error:', err);
-    if (err.type === 'network' || err.type === 'server-error') {
-      console.log('[PEER] Network error, connection may fail');
-    }
+  newPeer.on('error', (err) => {
+    console.error('[PEER] Error:', err.type, err.message);
+    initPromise = null;
+    reject(err);
+  });
   });
 
-  return peer;
+  return initPromise;
 }
 
 function setupConnection(conn: DataConnection, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void) {
   connections.set(conn.peer, conn);
+  
+  console.log('[PEER] Setting up connection to:', conn.peer, 'state:', conn.peerConnection?.connectionState);
+  
+  const timeout = setTimeout(() => {
+    if (!conn.open) {
+      const state = conn.peerConnection?.connectionState || 'unknown';
+      console.log('[PEER] Connection timeout after 30s for:', conn.peer, 'state:', state);
+      if (state === 'new' || state === 'failed') {
+        console.error('[PEER] Peer may not exist or is offline:', conn.peer);
+      }
+      conn.close();
+      connections.delete(conn.peer);
+      if (onDisconnect) onDisconnect();
+    }
+  }, 30000);
+  
+  if (conn.peerConnection) {
+    conn.peerConnection.addEventListener('connectionstatechange', () => {
+      console.log('[PEER] Connection state:', conn.peerConnection?.connectionState);
+    });
+    conn.peerConnection.addEventListener('iceconnectionstatechange', () => {
+      console.log('[PEER] ICE state:', conn.peerConnection?.iceConnectionState);
+    });
+  }
   
   conn.on('data', async (data) => {
     const raw = data as string;
@@ -99,38 +144,46 @@ function setupConnection(conn: DataConnection, onMessage: (peerId: string, data:
   });
 
   conn.on('open', () => {
-    console.log('[PEER] Connected to:', conn.peer);
+    clearTimeout(timeout);
+    console.log('[PEER] Connection OPEN to:', conn.peer);
     onConnect();
   });
 
   conn.on('close', () => {
-    console.log('[PEER] Disconnected from:', conn.peer);
+    clearTimeout(timeout);
+    console.log('[PEER] Connection CLOSE from:', conn.peer);
+    connections.delete(conn.peer);
+    if (onDisconnect) onDisconnect();
+  });
+  
+  conn.on('error', (err) => {
+    clearTimeout(timeout);
+    console.error('[PEER] Connection ERROR:', err);
     connections.delete(conn.peer);
     if (onDisconnect) onDisconnect();
   });
 }
 
 export function connectToPeer(remotePeerId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void, retryCount = 0) {
-  if (!peer) return;
+  if (!peer) {
+    console.error('[PEER] Cannot connect: peer not initialized');
+    return;
+  }
   if (connections.has(remotePeerId)) {
     console.log('[PEER] Already connected to:', remotePeerId);
     return;
   }
   
-  const conn = peer.connect(remotePeerId);
+  console.log(`[PEER] Connecting to ${remotePeerId} (attempt ${retryCount + 1})`);
+  console.log('[PEER] My peer ID:', peer.id);
+  console.log('[PEER] Target peer ID:', remotePeerId);
   
-  const retryTimeout = setTimeout(() => {
-    if (!conn.open && retryCount < 3) {
-      console.log(`[PEER] Retry attempt ${retryCount + 1}/3`);
-      conn.close();
-      connectToPeer(remotePeerId, onMessage, onConnect, onDisconnect, retryCount + 1);
-    }
-  }, 5000 * (retryCount + 1));
-  
-  conn.on('open', () => {
-    clearTimeout(retryTimeout);
+  const conn = peer.connect(remotePeerId, {
+    reliable: true,
+    serialization: 'json'
   });
   
+  console.log('[PEER] Connection object created:', conn);
   setupConnection(conn, onMessage, onConnect, onDisconnect);
 }
 
