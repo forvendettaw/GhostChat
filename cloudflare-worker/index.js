@@ -19,41 +19,48 @@ export class PeerSession {
       const url = new URL(request.url);
       const id = url.searchParams.get('id');
       
-      server.accept();
-      this.sessions.set(id, server);
+      this.state.acceptWebSocket(server, [id]);
       
       server.send(JSON.stringify({ type: 'OPEN' }));
-      
-      server.addEventListener('message', (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'OFFER' || data.type === 'ANSWER' || data.type === 'CANDIDATE') {
-          const target = this.sessions.get(data.dst);
-          if (target) target.send(event.data);
-        }
-      });
-      
-      server.addEventListener('close', () => {
-        this.sessions.delete(id);
-      });
       
       return new Response(null, { status: 101, webSocket: client });
     }
     
     return new Response('PeerJS Server', { headers: corsHeaders });
   }
+  
+  async webSocketMessage(ws, message) {
+    const data = JSON.parse(message);
+    
+    if (data.dst) {
+      const sockets = this.state.getWebSockets();
+      for (const socket of sockets) {
+        const tags = this.state.getTags(socket);
+        if (tags && tags[0] === data.dst) {
+          socket.send(message);
+          break;
+        }
+      }
+    }
+  }
+  
+  async webSocketClose(ws) {
+    // Socket already closed, just cleanup
+  }
 }
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    console.log('[WORKER] Request:', request.method, url.pathname);
+    
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
     
-    const url = new URL(request.url);
-    
-    if (url.pathname === '/peerjs/peerjs/id') {
-      return new Response(`"${crypto.randomUUID()}"`, {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    if (url.pathname === '/peerjs/id' || url.pathname === '/peerjs/peerjs/id') {
+      return new Response(crypto.randomUUID(), {
+        headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
       });
     }
     

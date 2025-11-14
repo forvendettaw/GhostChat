@@ -20,9 +20,7 @@ import { validateMessage } from "@/lib/input-validation";
 import { generateQRCode } from "@/lib/qr-code";
 import { getConnectionErrorMessage } from "@/lib/error-messages";
 import { saveSession, getSession, clearSession } from "@/lib/session-recovery";
-import Settings from "./Settings";
 import ErrorHandler from "./ErrorHandler";
-import Diagnostics from "./Diagnostics";
 
 interface ChatCoreProps {
   invitePeerId: string | null;
@@ -44,13 +42,18 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [showInvite, setShowInvite] = useState(true);
   const [linkCreated, setLinkCreated] = useState(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showDiagnostics, setShowDiagnostics] = useState(false);
+
+
   const [error, setError] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [fallbackWarning, setFallbackWarning] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const initialized = React.useRef(false);
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+    
     let mounted = true;
     
     (async () => {
@@ -112,11 +115,6 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    peer.on('error', (err) => {
-      console.error('[PEER] Error:', err);
-      setError(getConnectionErrorMessage(err));
-    });
-
     return () => {
       mounted = false;
       destroy();
@@ -159,10 +157,8 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-      {showDiagnostics && (
-        <Diagnostics onClose={() => setShowDiagnostics(false)} />
-      )}
+
+
       <ErrorHandler
         error={error}
         onRetry={handleRetry}
@@ -209,38 +205,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             Your ID: {peerId.slice(0, 8)}...
           </div>
         </div>
-        <div style={{ display: "flex", gap: 4 }}>
-          <button
-            onClick={() => setShowDiagnostics(true)}
-            style={{
-              padding: "4px 8px",
-              background: "#333",
-              border: "none",
-              borderRadius: 6,
-              color: "#fff",
-              fontSize: 10,
-              cursor: "pointer",
-              opacity: 0.7,
-            }}
-          >
-            Diagnostics
-          </button>
-          <button
-            onClick={() => setShowSettings(true)}
-            style={{
-              padding: "4px 8px",
-              background: "#333",
-              border: "none",
-              borderRadius: 6,
-              color: "#fff",
-              fontSize: 10,
-              cursor: "pointer",
-              opacity: 0.7,
-            }}
-          >
-            Settings
-          </button>
-        </div>
+
       </div>
       <div style={{ padding: "0 16px 16px" }}>
         <div
@@ -307,20 +272,21 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(inviteLink);
-                          alert('Link copied!');
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
                         }}
                         style={{
                           padding: '6px 12px',
-                          background: '#fff',
+                          background: copied ? '#0f0' : '#fff',
                           border: 'none',
                           borderRadius: 6,
-                          color: '#000',
+                          color: copied ? '#000' : '#000',
                           fontSize: 10,
                           cursor: 'pointer',
                           fontWeight: 600
                         }}
                       >
-                        Copy Link
+                        {copied ? 'Copied!' : 'Copy Link'}
                       </button>
                       <button
                         onClick={() => {
@@ -445,6 +411,32 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         >
           Send
         </button>
+      </div>
+      <div
+        style={{
+          padding: "6px 12px",
+          background: "#0a0a0a",
+          borderTop: "1px solid #333",
+          fontSize: 9,
+          opacity: 0.7,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "8px",
+        }}
+      >
+        <span>
+          Status: <span style={{ color: connected ? "#0f0" : connecting ? "#ff0" : "#f00" }}>
+            {connected ? "Connected" : connecting ? "Connecting" : "Disconnected"}
+          </span>
+        </span>
+        <span>ID: {peerId ? peerId.slice(0, 8) : "..."}</span>
+        <span>Protocol: simple-peer</span>
+        <span>Messages: {messages.length}</span>
+        <span>Queue: {messageQueue.length}</span>
+        {error && <span style={{ color: "#f00" }}>Error: {error.slice(0, 20)}...</span>}
+        {fallbackWarning && <span style={{ color: "#ff0" }}>Fallback Mode</span>}
       </div>
     </div>
   );

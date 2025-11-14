@@ -7,6 +7,5 @@ name = "PEER_SESSION"
 class_name = "PeerSession"
 
 [[migrations]]
-tag = "v2"
-deleted_classes = ["PeerRegistry"]
+tag = "v3"
 new_sqlite_classes = ["PeerSession"]
