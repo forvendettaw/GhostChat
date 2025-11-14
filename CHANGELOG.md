@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.2] - 2025-01-XX
+
+### Changed
+- **Component Refactoring**: Split ChatCore into 6 focused components
+  - ConnectionStatus: Connection state display
+  - InviteSection: Invite link creation and QR code
+  - MessageList: Message rendering
+  - MessageInput: Input field and file upload
+  - UploadProgress: File upload progress bar
+  - DiagnosticsFooter: Live diagnostics display
+- Improved code maintainability and testability
+- Reduced ChatCore from 400+ lines to ~200 lines
+
+### Technical
+- Better separation of concerns
+- Easier to test individual components
+- More reusable component architecture
+
+---
+
 ## [0.3.1] - 2025-01-XX
 
 ### Fixed
