@@ -9,11 +9,7 @@ import {
   destroy,
 } from "@/lib/peer-manager";
 import { inviteManager } from "@/lib/invite-manager";
-import {
-  isMobile,
-  requestWakeLock,
-  ensureHTTPS,
-} from "@/lib/mobile-utils";
+import { isMobile, requestWakeLock, ensureHTTPS } from "@/lib/mobile-utils";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { validateMessage } from "@/lib/input-validation";
 import { getConnectionErrorMessage } from "@/lib/error-messages";
@@ -63,9 +59,11 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     sent: number;
     total: number;
   } | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   const initialized = React.useRef(false);
   const startTime = React.useRef(Date.now());
+  const typingTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const uptimeInterval = setInterval(() => {
@@ -82,6 +80,12 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       }
 
       const handleMessage = (fromPeerId: string, data: string) => {
+        if (data === "__typing__") {
+          setIsTyping(true);
+          if (typingTimeout.current) clearTimeout(typingTimeout.current);
+          typingTimeout.current = setTimeout(() => setIsTyping(false), 3000);
+          return;
+        }
         const fileData = deserializeFileMessage(data);
         if (fileData) {
           storeMessage({
@@ -113,7 +117,12 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       const handleDisconnect = (reason?: string) => {
         setConnected(false);
         setConnecting(false);
-        setError(getConnectionErrorMessage({ type: reason || "disconnected" }));
+        destroy();
+        if (invitePeerId) {
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        }
       };
 
       const handleFallback = () => {
@@ -125,7 +134,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         handleMessage,
         handleConnect,
         handleDisconnect,
-        handleFallback
+        handleFallback,
       );
 
       if (peer && peer.id) {
@@ -141,8 +150,15 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             validPeerId || invitePeerId,
             handleMessage,
             handleConnect,
-            handleDisconnect
+            handleDisconnect,
           );
+          
+          setTimeout(() => {
+            if (!connected) {
+              setConnecting(false);
+              setError(getConnectionErrorMessage({ type: "peer-unavailable" }));
+            }
+          }, 15000);
         }
       }
 
@@ -155,7 +171,10 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         clearInterval(uptimeInterval);
         destroy();
         clearSession();
-        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange,
+        );
       };
     })();
   }, []);
@@ -219,18 +238,9 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     e.target.value = "";
   };
 
-  const handleRetry = () => {
-    setError(null);
-    window.location.reload();
-  };
-
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <ErrorHandler
-        error={error}
-        onRetry={handleRetry}
-        onDismiss={() => setError(null)}
-      />
+      <ErrorHandler error={error} />
       {fallbackWarning && (
         <div
           style={{
@@ -286,6 +296,11 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
 
       <div style={{ flex: 1, overflow: "auto", padding: 16 }}>
         <MessageList messages={messages} />
+        {isTyping && (
+          <div style={{ opacity: 0.6, fontSize: 11, fontStyle: "italic" }}>
+            Peer is typing...
+          </div>
+        )}
       </div>
 
       {uploadProgress && <UploadProgress {...uploadProgress} />}
@@ -295,6 +310,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         connected={connected}
         onSend={sendMessage}
         onFileSelect={handleFileSelect}
+        onTyping={() => connected && sendToAll("__typing__")}
       />
       <DiagnosticsFooter
         connected={connected}

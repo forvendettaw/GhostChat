@@ -44,7 +44,7 @@ export default function InviteSection({
           {inviteLink ? (
             <>
               <div style={{ marginBottom: 8, opacity: 0.8 }}>
-                Share this link with your friend:
+                Share this link with your peer:
               </div>
               <div
                 style={{

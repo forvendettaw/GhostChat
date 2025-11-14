@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.4.1] - 2025-01-15
+
+### Added
+- **Typing Indicators**: Shows "Peer is typing..." when peer is composing a message
+- **Auto-Scroll**: Messages automatically scroll to latest message
+- **Link Auto-Detection**: URLs in messages become clickable links
+- **Character Counter**: Shows character count (X/500) while typing
+- **Copy Message**: Click any message to copy its text to clipboard
+
+### Changed
+- **Terminology**: Replaced "friend" with "peer" throughout the app for consistency
+- **Disconnect Handling**: Improved peer disconnect detection and error messages
+- **Error Messages**: More precise disconnect reasons (peer left vs network error)
+- **Auto-Redirect**: Joiner tab redirects to home when peer disconnects
+- **Simplified Errors**: Removed confusing troubleshooting tips from error dialogs
+
+### Fixed
+- **ICE Connection Detection**: Faster disconnect detection (1-2 seconds vs 1 minute)
+- **Connection State**: Proper ICE connection state monitoring
+- **Error Handler**: Removed retry/dismiss buttons for peer disconnect scenarios
+
+### Technical
+- Added typing event signaling via P2P channel
+- Implemented ICE connection state change listeners
+- Improved disconnect reason propagation through protocol layers
+- Debounced typing events (300ms) to reduce network traffic
+
+---
+
 ## [0.3.2] - 2025-01-XX
 
 ### Changed

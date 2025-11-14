@@ -62,13 +62,18 @@ function setupConnection(
 
   conn.on('close', () => {
     connections.delete(conn.peer);
-    if (onDisconnect) onDisconnect();
+    if (onDisconnect) onDisconnect('peer-left');
   });
 
   conn.on('error', (err) => {
     console.error('[PEERJS] Connection error:', err);
     connections.delete(conn.peer);
-    if (onDisconnect) onDisconnect();
+    const errMsg = err?.message || err?.toString() || '';
+    if (errMsg.includes('Ice connection failed') || errMsg.includes('disconnected')) {
+      if (onDisconnect) onDisconnect('peer-left');
+    } else {
+      if (onDisconnect) onDisconnect('network-error');
+    }
   });
 }
 

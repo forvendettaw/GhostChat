@@ -62,7 +62,10 @@ async function tryConnectWorker(
     
     ws.onclose = () => {
       console.log('[SIMPLEPEER] WebSocket closed');
-      if (storedOnDisconnect) storedOnDisconnect();
+      if (peer && peer.connected) {
+        peer.destroy();
+      }
+      if (storedOnDisconnect) storedOnDisconnect('peer-left');
     };
     
     setTimeout(() => reject(new Error('Worker timeout')), 5000);
@@ -103,6 +106,13 @@ function setupPeer(
   onDisconnect?: (reason?: string) => void,
   targetPeerId?: string
 ) {
+  let disconnectCalled = false;
+  const callDisconnect = (reason: string) => {
+    if (!disconnectCalled && onDisconnect) {
+      disconnectCalled = true;
+      onDisconnect(reason);
+    }
+  };
   p.on('signal', (signal) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       const dst = targetPeerId || remotePeerId || 'unknown';
@@ -119,6 +129,16 @@ function setupPeer(
   p.on('connect', () => {
     console.log('[SIMPLEPEER] P2P connected');
     onConnect();
+    
+    const pc = (p as any)._pc;
+    if (pc) {
+      pc.oniceconnectionstatechange = () => {
+        if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
+          console.log('[SIMPLEPEER] ICE state:', pc.iceConnectionState);
+          callDisconnect('peer-left');
+        }
+      };
+    }
   });
   
   p.on('data', (data) => {
@@ -127,12 +147,17 @@ function setupPeer(
   
   p.on('close', () => {
     console.log('[SIMPLEPEER] P2P closed gracefully');
-    if (onDisconnect) onDisconnect('peer-left');
+    callDisconnect('peer-left');
   });
   
   p.on('error', (err) => {
     console.error('[SIMPLEPEER] P2P error:', err);
-    if (onDisconnect) onDisconnect('network-error');
+    const errMsg = err?.message || err?.toString() || '';
+    if (errMsg.includes('Ice connection failed')) {
+      callDisconnect('peer-left');
+    } else {
+      callDisconnect('network-error');
+    }
   });
 }
 

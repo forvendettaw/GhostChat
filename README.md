@@ -23,31 +23,39 @@ This project is shared for educational purposes only. Users are responsible for 
 
 ### What is GhostChat?
 
-GhostChat is a truly private chat app where messages travel directly between you and your friend - no servers storing or reading your conversations. When you close the tab, everything vanishes completely. No history, no traces, no tracking. Your messages are ghosts that disappear.
+GhostChat is a truly private chat app where messages travel directly between you and your peer - no servers storing or reading your conversations. When you close the tab, everything vanishes completely. No history, no traces, no tracking. Your messages are ghosts that disappear.
 
 ### How to Use
 
 **Step 1: Create a room**
+
 - Open the website
 - Click "Start Chatting"
 - Click "Create Room"
 - You'll see a "Copy Invite Link" button
 
 **Step 2: Share the invite link**
-- Click "Copy Invite Link"
-- Share the link with your friend (via text, email, WhatsApp, etc.)
 
-**Step 3: Your friend joins**
+- Click "Copy Invite Link"
+- Share the link with your peer (via text, email, WhatsApp, etc.)
+
+**Step 3: Your peer joins**
+
 - They click your invite link
 - Opens directly in their browser
 - Automatically connects to you
 
 **Step 4: Chat directly**
+
 - Once connected, you'll see "Connected" status
-- Type messages and press Enter or click Send
+- Type messages and press Enter to send
+- See "Peer is typing..." when they're composing
+- Click any message to copy it
 - Messages travel directly between you (peer-to-peer)
+- Share files up to 10MB
 
 **Step 5: End the chat**
+
 - Close the browser tab
 - All messages instantly disappear from memory
 - Invite link expires
@@ -58,6 +66,9 @@ GhostChat is a truly private chat app where messages travel directly between you
 ### Key Features
 
 - **Direct P2P**: Messages and files never touch servers
+- **Typing Indicators**: See when peer is typing
+- **Clickable Links**: URLs automatically become clickable
+- **File Sharing**: Send files up to 10MB directly P2P
 - **Memory-only**: RAM storage, auto-wipe on tab close
 - **Ephemeral**: New identity each session, no history
 - **Auto-blur**: Screen protection when switching tabs
@@ -138,7 +149,7 @@ npm run build
 
 1. User creates room → Generates unique peer ID
 2. Invite link shared → Contains peer ID in URL (`?peer=abc123`)
-3. Friend clicks link → Extracts peer ID from URL
+3. peer clicks link → Extracts peer ID from URL
 4. Direct connection → WebRTC P2P link established
 5. Messages flow → Direct peer-to-peer (no server involved)
 6. Tab closes → Everything wiped from memory
@@ -177,6 +188,7 @@ public/
 ### Development
 
 **Local Testing**:
+
 ```bash
 # Terminal
 npm run dev
@@ -191,6 +203,7 @@ Paste invite link (e.g., localhost:3000/chat?peer=abc123xyz)
 ```
 
 **Multi-Device Testing**:
+
 ```bash
 # Get local IP
 ifconfig | grep "inet " | grep -v 127.0.0.1
@@ -201,9 +214,10 @@ ifconfig | grep "inet " | grep -v 127.0.0.1
 ```
 
 **Debug WebRTC**:
+
 ```javascript
 // Browser console
-localStorage.debug = 'simple-peer'
+localStorage.debug = "simple-peer";
 // Reload page
 ```
 
@@ -243,7 +257,7 @@ function getMessages() {
 }
 
 // Auto-clear when tab closes
-window.addEventListener('beforeunload', () => {
+window.addEventListener("beforeunload", () => {
   messages = []; // Wipe from memory
 });
 ```
@@ -268,8 +282,8 @@ Automatic privacy protections with minimal code:
 
 ```typescript
 // Blur screen when tab loses focus (shoulder surfing protection)
-document.addEventListener('visibilitychange', () => {
-  document.body.style.filter = document.hidden ? 'blur(10px)' : 'none';
+document.addEventListener("visibilitychange", () => {
+  document.body.style.filter = document.hidden ? "blur(10px)" : "none";
 });
 
 // Invite links expire after 1 hour
@@ -283,18 +297,16 @@ Messages sent directly peer-to-peer via WebRTC data channels:
 
 ```typescript
 // Establish P2P connection
-const peer = await connectToPeer('peer-id');
+const peer = await connectToPeer("peer-id");
 
 // Send message directly (no relay)
-peer.send('Hello, world!');
+peer.send("Hello, world!");
 
 // Listen for direct messages
-peer.on('data', (message) => {
+peer.on("data", (message) => {
   console.log(message); // Direct from peer
 });
 ```
-
-
 
 ## Privacy & Security
 
@@ -325,16 +337,19 @@ We welcome contributions! This is a community-driven project focused on privacy 
 ## Troubleshooting
 
 **Connection failed?**
+
 - Check firewall settings
 - Try different network
 - Some corporate networks block WebRTC
 
 **Messages not syncing?**
+
 - Check both users have same invite link
 - Check browser console for errors
 - Refresh and try again
 
 **Icons not loading?**
+
 - Clear browser cache
 - Restart dev server
 
@@ -370,7 +385,7 @@ No. Memory-only storage means zero disk traces.
 **Why not use Signal/WhatsApp?**  
 GhostChat has no central servers, no phone numbers, no persistent identity. Messages truly disappear.
 
-**Can my friend see my IP address?**  
+**Can my peer see my IP address?**  
 Yes, that's how P2P works. Use a VPN to mask your IP if needed.
 
 ---
@@ -381,14 +396,19 @@ Yes, that's how P2P works. Use a VPN to mask your IP if needed.
 **Cost**: $0 forever (free tier infrastructure)  
 **Capacity**: 200,000 requests/day (~10,000 chat sessions)
 
-**✨ v0.3.0 Features**:
-- Self-hosted Cloudflare Workers signaling (no 0.peerjs.com dependency)
-- Multi-worker cascading fallback (2 workers + PeerJS backup)
-- Live diagnostics footer (real-time connection status)
-- Professional UI (no alert popups, inline feedback)
-- 200k requests/day capacity (10k chat sessions)
+**✨ v0.4.1 Features**:
+
+- Typing indicators ("Peer is typing...")
+- Auto-scroll to latest message
+- Clickable URLs in messages
+- Character counter (500 max)
+- Click message to copy text
+- Improved disconnect handling
+- Faster disconnect detection (1-2 seconds)
+- Cleaner error messages
 
 **⚠️ Limitations**:
+
 - Invite links expire when creator closes tab
 - Connection success varies by network (70-80% cross-network)
 - Free TURN servers may be rate-limited

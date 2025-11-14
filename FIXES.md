@@ -11,11 +11,13 @@ Fixed all critical and high-priority issues identified in the code review. The p
 **Problem**: Build failed due to missing `@types/simple-peer` package.
 
 **Error**:
+
 ```
 Type error: Could not find a declaration file for module 'simple-peer'
 ```
 
-**Fix**: 
+**Fix**:
+
 ```bash
 npm install --save-dev @types/simple-peer
 ```
@@ -29,11 +31,13 @@ npm install --save-dev @types/simple-peer
 **Problem**: Type mismatch in `lib/peer-simplepeer.ts` for `storedOnDisconnect` variable.
 
 **Error**:
+
 ```
 Type 'undefined' is not assignable to type '(() => void) | null'
 ```
 
 **Fix**: Changed type declaration from `null` to `undefined` for consistency:
+
 ```typescript
 // Before
 let storedOnDisconnect: (() => void) | null = null;
@@ -61,19 +65,21 @@ let storedOnDisconnect: (() => void) | undefined = undefined;
 **Problem**: E2E tests searched for UI elements that no longer exist after UI changes.
 
 **Failing Tests**:
+
 - Looking for "Create Invite Link" button (now "Create Room")
 - Looking for "Settings" button (removed)
 - Looking for "Diagnostics" button (removed)
 
 **Fix**: Updated `tests/e2e/chat.spec.ts`:
+
 ```typescript
 // Before
-await expect(page.locator('text=Create Invite Link')).toBeVisible()
-await expect(page.locator('button:has-text("Settings")')).toBeVisible()
-await expect(page.locator('button:has-text("Diagnostics")')).toBeVisible()
+await expect(page.locator("text=Create Invite Link")).toBeVisible();
+await expect(page.locator('button:has-text("Settings")')).toBeVisible();
+await expect(page.locator('button:has-text("Diagnostics")')).toBeVisible();
 
 // After
-await expect(page.locator('text=Create Room')).toBeVisible()
+await expect(page.locator("text=Create Room")).toBeVisible();
 // Removed Settings and Diagnostics tests
 ```
 
@@ -86,23 +92,24 @@ await expect(page.locator('text=Create Room')).toBeVisible()
 **Problem**: `tests/file-transfer.test.ts` used console.log instead of proper Vitest assertions.
 
 **Fix**: Converted to proper Vitest format:
+
 ```typescript
 // Before
-console.log('Test Complete');
+console.log("Test Complete");
 if (reassembledFile) {
-  console.log('✓ File reassembled successfully');
+  console.log("✓ File reassembled successfully");
 }
 
 // After
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-describe('File Transfer', () => {
-  it('should chunk large files into multiple messages', () => {
+describe("File Transfer", () => {
+  it("should chunk large files into multiple messages", () => {
     const chunks = serializeFileMessage(mockFileData);
     expect(chunks.length).toBeGreaterThan(1);
   });
-  
-  it('should reassemble chunked file data correctly', () => {
+
+  it("should reassemble chunked file data correctly", () => {
     // Proper assertions
     expect(reassembledFile).not.toBeNull();
     expect(reassembledFile?.name).toBe(mockFileData.name);
@@ -117,6 +124,7 @@ describe('File Transfer', () => {
 ## Test Results
 
 ### Unit Tests
+
 ```
 ✓ tests/file-transfer.test.ts (2 tests) 4ms
 Test Files  1 passed (1)
@@ -124,6 +132,7 @@ Tests  2 passed (2)
 ```
 
 ### Build
+
 ```
 ✓ Compiled successfully
 ✓ Linting and checking validity of types
@@ -143,7 +152,7 @@ Route (app)                Size     First Load JS
 1. **Component Refactoring**: ChatCore.tsx is 400+ lines and could be split into smaller components
 2. **Performance Monitoring**: Add connection success rate tracking
 3. **Accessibility**: Add ARIA labels and keyboard navigation
-4. **Error Messages**: More user-friendly error messages with actionable guidance
+4. **Error Messages**: More user-peerly error messages with actionable guidance
 
 ### Low Priority
 
@@ -156,6 +165,7 @@ Route (app)                Size     First Load JS
 ## Conclusion
 
 All critical issues have been resolved. The project now:
+
 - ✅ Builds successfully without errors
 - ✅ Has working unit tests with proper assertions
 - ✅ Has E2E tests that match the current UI

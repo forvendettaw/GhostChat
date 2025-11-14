@@ -44,7 +44,7 @@ export default function InviteSection({
           {inviteLink ? (
             <>
               <div style={{ marginBottom: 8, opacity: 0.8 }}>
-                Share this link with your friend:
+                Share this link with peer:
               </div>
               <div
                 style={{
@@ -144,8 +144,7 @@ export default function InviteSection({
             </>
           )}
           <div style={{ opacity: 0.6, fontSize: 10 }}>
-            Your peer must paste it in their browser or scan QR code to start a
-            chat
+            Peer must paste it in their browser or scan QR code to start chat
           </div>
           <div
             style={{

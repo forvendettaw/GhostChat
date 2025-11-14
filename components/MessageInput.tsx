@@ -9,6 +9,7 @@ interface MessageInputProps {
   connected: boolean;
   onSend: () => void;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTyping: () => void;
 }
 
 export default function MessageInput({
@@ -17,18 +18,34 @@ export default function MessageInput({
   connected,
   onSend,
   onFileSelect,
+  onTyping,
 }: MessageInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const typingTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const maxChars = 500;
 
   return (
-    <div
-      style={{
-        padding: 16,
-        borderTop: "1px solid #333",
-        display: "flex",
-        gap: 8,
-      }}
-    >
+    <div style={{ borderTop: "1px solid #333" }}>
+      {input.length > 0 && (
+        <div
+          style={{
+            padding: "4px 16px",
+            fontSize: 10,
+            opacity: 0.6,
+            textAlign: "right",
+          }}
+        >
+          {input.length}/{maxChars}
+        </div>
+      )}
+      <div
+        style={{
+          padding: 16,
+          display: "flex",
+          gap: 8,
+        }}
+      >
       <input
         type="file"
         ref={fileInputRef}
@@ -54,7 +71,13 @@ export default function MessageInput({
       </button>
       <input
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={(e) => {
+          setInput(e.target.value);
+          if (connected && e.target.value) {
+            if (typingTimer.current) clearTimeout(typingTimer.current);
+            typingTimer.current = setTimeout(() => onTyping(), 300);
+          }
+        }}
         onKeyPress={(e) => {
           if (e.key === "Enter" && connected) {
             e.preventDefault();
@@ -75,7 +98,9 @@ export default function MessageInput({
           outline: "none",
           cursor: connected ? "text" : "not-allowed",
         }}
+        maxLength={maxChars}
       />
+      </div>
     </div>
   );
 }

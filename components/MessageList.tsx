@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 interface Message {
   text: string;
   peerId: string;
@@ -17,6 +19,12 @@ interface MessageListProps {
 }
 
 export default function MessageList({ messages }: MessageListProps) {
+  const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   if (messages.length === 0) {
     return (
       <div style={{ textAlign: "center", opacity: 0.5, marginTop: 40 }}>
@@ -36,6 +44,11 @@ export default function MessageList({ messages }: MessageListProps) {
           }}
         >
           <div
+            onClick={() => {
+              if (msg.text) {
+                navigator.clipboard.writeText(msg.text);
+              }
+            }}
             style={{
               display: "inline-block",
               padding: "8px 12px",
@@ -43,7 +56,9 @@ export default function MessageList({ messages }: MessageListProps) {
               color: msg.isSelf ? "#000" : "#fff",
               borderRadius: 8,
               maxWidth: "70%",
+              cursor: msg.text ? "pointer" : "default",
             }}
+            title={msg.text ? "Click to copy" : ""}
           >
             {msg.file ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -79,11 +94,19 @@ export default function MessageList({ messages }: MessageListProps) {
                 )}
               </div>
             ) : msg.text ? (
-              msg.text
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: msg.text.replace(
+                    /(https?:\/\/[^\s]+)/g,
+                    '<a href="$1" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline">$1</a>'
+                  ),
+                }}
+              />
             ) : null}
           </div>
         </div>
       ))}
+      <div ref={endRef} />
     </>
   );
 }
