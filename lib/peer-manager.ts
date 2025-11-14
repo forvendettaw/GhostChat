@@ -6,7 +6,33 @@ import { trackSent, trackReceived } from './bandwidth-monitor';
 let peer: Peer | null = null;
 const connections = new Map<string, DataConnection>();
 
-function getPeerConfig() {
+const PRIMARY_SERVER = {
+  host: 'ghostchat-signaling.teycir.workers.dev',
+  port: 443,
+  path: '/peerjs',
+  secure: true
+};
+
+const FALLBACK_SERVER = {
+  host: '0.peerjs.com',
+  port: 443,
+  path: '/',
+  secure: true
+};
+
+let usingFallback = false;
+
+async function testServer(config: any): Promise<boolean> {
+  try {
+    const url = `https://${config.host}${config.path}/peerjs/id`;
+    const response = await fetch(url, { signal: AbortSignal.timeout(3000) });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function getPeerConfig() {
   const customHost = localStorage.getItem('peerjs_host');
   
   if (customHost) {
@@ -20,19 +46,25 @@ function getPeerConfig() {
     };
   }
   
-  return {
-    host: '0.peerjs.com',
-    port: 443,
-    path: '/',
-    secure: true
-  };
+  const primaryWorks = await testServer(PRIMARY_SERVER);
+  if (primaryWorks) {
+    usingFallback = false;
+    return PRIMARY_SERVER;
+  }
+  
+  usingFallback = true;
+  return FALLBACK_SERVER;
 }
 
-export function initPeer(roomId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void) {
+export async function initPeer(roomId: string, onMessage: (peerId: string, data: string) => void, onConnect: () => void, onDisconnect?: () => void, onFallback?: () => void) {
   if (peer) return peer;
 
   const id = Math.random().toString(36).substr(2, 9);
-  const peerConfig = getPeerConfig();
+  const peerConfig = await getPeerConfig();
+  
+  if (usingFallback && onFallback) {
+    onFallback();
+  }
   
   peer = new Peer(id, {
     ...peerConfig,

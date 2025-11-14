@@ -48,8 +48,10 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
+  const [fallbackWarning, setFallbackWarning] = useState(false);
 
   useEffect(() => {
+    (async () => {
     if (isMobile()) {
       ensureHTTPS();
       requestWakeLock();
@@ -77,7 +79,11 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       setError(getConnectionErrorMessage({ type: 'disconnected' }));
     };
 
-    const peer = initPeer("", handleMessage, handleConnect, handleDisconnect);
+    const handleFallback = () => {
+      setFallbackWarning(true);
+    };
+
+    const peer = await initPeer("", handleMessage, handleConnect, handleDisconnect, handleFallback);
 
     peer.on("open", (id) => {
       console.log("[PEER] My ID:", id);
@@ -124,6 +130,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       clearSession();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
+    })();
   }, [invitePeerId]);
 
   const sendMessage = () => {
@@ -168,6 +175,33 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         onRetry={handleRetry}
         onDismiss={() => setError(null)}
       />
+      {fallbackWarning && (
+        <div style={{
+          padding: 12,
+          background: '#ff0',
+          color: '#000',
+          fontSize: 11,
+          textAlign: 'center',
+          borderBottom: '1px solid #333'
+        }}>
+          Custom server unavailable. Using free public server (0.peerjs.com)
+          <button
+            onClick={() => setFallbackWarning(false)}
+            style={{
+              marginLeft: 8,
+              padding: '2px 8px',
+              background: '#000',
+              color: '#ff0',
+              border: 'none',
+              borderRadius: 4,
+              fontSize: 10,
+              cursor: 'pointer'
+            }}
+          >
+            OK
+          </button>
+        </div>
+      )}
       <div
         style={{
           padding: 16,
