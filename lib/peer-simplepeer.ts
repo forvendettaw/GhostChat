@@ -8,13 +8,13 @@ let peer: SimplePeer.Instance | null = null;
 let remotePeerId: string | null = null;
 let storedOnMessage: ((peerId: string, data: string) => void) | null = null;
 let storedOnConnect: (() => void) | null = null;
-let storedOnDisconnect: (() => void) | undefined = undefined;
+let storedOnDisconnect: ((reason?: string) => void) | undefined = undefined;
 
 async function tryConnectWorker(
   workerUrl: string,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ): Promise<string | null> {
   storedOnMessage = onMessage;
   storedOnConnect = onConnect;
@@ -72,7 +72,7 @@ async function tryConnectWorker(
 export async function initSimplePeer(
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ): Promise<string | null> {
   resetWorkerPool();
   
@@ -100,7 +100,7 @@ function setupPeer(
   p: SimplePeer.Instance,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void,
+  onDisconnect?: (reason?: string) => void,
   targetPeerId?: string
 ) {
   p.on('signal', (signal) => {
@@ -126,13 +126,13 @@ function setupPeer(
   });
   
   p.on('close', () => {
-    console.log('[SIMPLEPEER] P2P closed');
-    if (onDisconnect) onDisconnect();
+    console.log('[SIMPLEPEER] P2P closed gracefully');
+    if (onDisconnect) onDisconnect('peer-left');
   });
   
   p.on('error', (err) => {
     console.error('[SIMPLEPEER] P2P error:', err);
-    if (onDisconnect) onDisconnect();
+    if (onDisconnect) onDisconnect('network-error');
   });
 }
 
@@ -140,7 +140,7 @@ export function connectSimplePeer(
   targetPeerId: string,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ) {
   console.log('[SIMPLEPEER] Connecting to:', targetPeerId);
   remotePeerId = targetPeerId;

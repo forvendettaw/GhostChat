@@ -110,10 +110,10 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         });
       };
 
-      const handleDisconnect = () => {
+      const handleDisconnect = (reason?: string) => {
         setConnected(false);
         setConnecting(false);
-        setError(getConnectionErrorMessage({ type: "disconnected" }));
+        setError(getConnectionErrorMessage({ type: reason || "disconnected" }));
       };
 
       const handleFallback = () => {

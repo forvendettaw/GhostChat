@@ -21,6 +21,14 @@ export function getConnectionErrorMessage(error: any): string {
     return 'HTTPS required for WebRTC. Use https:// or localhost.';
   }
   
+  if (errorType === 'peer-left') {
+    return 'Your friend closed their tab and left the chat.';
+  }
+  
+  if (errorType === 'network-error') {
+    return 'Network connection lost. Check your internet or try reconnecting.';
+  }
+  
   if (errorType === 'disconnected') {
     return 'Connection lost. Your friend may have closed their tab or lost internet.';
   }

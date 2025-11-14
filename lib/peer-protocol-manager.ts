@@ -8,7 +8,7 @@ let currentProtocol: Protocol | null = null;
 export async function initPeer(
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void,
+  onDisconnect?: (reason?: string) => void,
   onFallback?: () => void
 ): Promise<string | null> {
   try {
@@ -38,7 +38,7 @@ export function connectToPeer(
   remotePeerId: string,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ) {
   if (currentProtocol === 'simplepeer') {
     SimplePeerProtocol.connectSimplePeer(remotePeerId, onMessage, onConnect, onDisconnect);

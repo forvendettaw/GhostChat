@@ -7,7 +7,7 @@ export async function initPeer(
   roomId: string,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void,
+  onDisconnect?: (reason?: string) => void,
   onFallback?: () => void
 ): Promise<{ id: string } | null> {
   if (peerId) {
@@ -45,7 +45,7 @@ export function connectToPeer(
   remotePeerId: string,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ) {
   const wrappedOnMessage = (fromPeerId: string, data: string) => {
     trackReceived(data.length);
