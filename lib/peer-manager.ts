@@ -21,7 +21,7 @@ function getPeerConfig() {
   }
   
   return {
-    host: 'ghostchat-signaling.teycir.workers.dev',
+    host: '0.peerjs.com',
     port: 443,
     path: '/',
     secure: true

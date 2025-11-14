@@ -10,6 +10,8 @@ export default function Home() {
         alignItems: "center",
         justifyContent: "center",
         padding: 20,
+        background: "#000",
+        color: "#fff",
       }}
     >
       <img

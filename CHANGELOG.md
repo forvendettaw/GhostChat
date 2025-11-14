@@ -2,6 +2,24 @@
 
 All notable changes to GhostChat will be documented in this file.
 
+## [0.2.1] - 2025-11-14 (Alpha Hotfix)
+
+### Fixed
+- **Critical**: Invite link button now appears immediately (was waiting for peer connection)
+- **Critical**: QR code now displays correctly (CSP updated to allow api.qrserver.com)
+- **Critical**: PeerJS server path corrected (/peerjs instead of /)
+- Switched to public PeerJS server (0.peerjs.com) as default (custom server needs proper implementation)
+- Added "Copy Link" button for easier sharing
+- Added loading states ("Initializing...", "Generating link...")
+- Added debug logging for QR code rendering
+- Fixed button disabled state based on peer readiness
+
+### Changed
+- Default PeerJS server: 0.peerjs.com (reliable public server)
+- Custom server (ghostchat-signaling.teycir.workers.dev) available via Settings
+- QR button text shortened to "Show QR" / "Hide QR"
+- Improved UX with immediate feedback on all actions
+
 ## [0.2.0] - 2025-01-15 (Alpha)
 
 ### Status

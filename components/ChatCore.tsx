@@ -41,7 +41,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [inviteLink, setInviteLink] = useState("");
-  const [showInvite, setShowInvite] = useState(false);
+  const [showInvite, setShowInvite] = useState(true);
   const [linkCreated, setLinkCreated] = useState(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
   const [showSettings, setShowSettings] = useState(false);
@@ -106,8 +106,6 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             );
           }
         });
-      } else {
-        setShowInvite(true);
       }
     });
 
@@ -236,61 +234,97 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             {!linkCreated ? (
               <button
                 onClick={() => setLinkCreated(true)}
+                disabled={!peerId}
                 style={{
                   padding: "6px 12px",
-                  background: "#fff",
+                  background: peerId ? "#fff" : "#333",
                   border: "none",
                   borderRadius: 8,
-                  color: "#000",
+                  color: peerId ? "#000" : "#666",
                   fontSize: 11,
-                  cursor: "pointer",
+                  cursor: peerId ? "pointer" : "not-allowed",
                   fontWeight: 600,
                 }}
               >
-                Create Invite Link
+                {peerId ? "Create Invite Link" : "Initializing..."}
               </button>
             ) : (
               <div style={{ fontSize: 11, lineHeight: 1.5 }}>
-                <div style={{ marginBottom: 8, opacity: 0.8 }}>
-                  Share this link with your friend:
-                </div>
-                <div
-                  style={{
-                    padding: 8,
-                    background: "#1a1a1a",
-                    borderRadius: 6,
-                    wordBreak: "break-all",
-                    fontSize: 10,
-                    marginBottom: 8,
-                    border: "1px solid #333",
-                  }}
-                >
-                  {inviteLink}
-                </div>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                  <button
-                    onClick={() => setShowQR(!showQR)}
-                    style={{
-                      padding: '4px 8px',
-                      background: '#333',
-                      border: 'none',
-                      borderRadius: 6,
-                      color: '#fff',
-                      fontSize: 10,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {showQR ? 'Hide QR' : 'Show QR Code'}
-                  </button>
-                </div>
-                {showQR && (
-                  <div style={{ textAlign: 'center', marginBottom: 8 }}>
-                    <img
-                      src={generateQRCode(inviteLink)}
-                      alt="QR Code"
-                      style={{ maxWidth: '200px', border: '2px solid #333', borderRadius: 8 }}
-                    />
+                {inviteLink ? (
+                  <>
+                    <div style={{ marginBottom: 8, opacity: 0.8 }}>
+                      Share this link with your friend:
+                    </div>
+                    <div
+                      style={{
+                        padding: 8,
+                        background: "#1a1a1a",
+                        borderRadius: 6,
+                        wordBreak: "break-all",
+                        fontSize: 10,
+                        marginBottom: 8,
+                        border: "1px solid #333",
+                      }}
+                    >
+                      {inviteLink}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ marginBottom: 8, opacity: 0.6, fontSize: 10 }}>
+                    Generating link...
                   </div>
+                )}
+                {inviteLink && (
+                  <>
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(inviteLink);
+                          alert('Link copied!');
+                        }}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          color: '#000',
+                          fontSize: 10,
+                          cursor: 'pointer',
+                          fontWeight: 600
+                        }}
+                      >
+                        Copy Link
+                      </button>
+                      <button
+                        onClick={() => {
+                          console.log('[QR] Toggle clicked, current:', showQR);
+                          setShowQR(!showQR);
+                        }}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#333',
+                          border: 'none',
+                          borderRadius: 6,
+                          color: '#fff',
+                          fontSize: 10,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {showQR ? 'Hide QR' : 'Show QR'}
+                      </button>
+                    </div>
+                    {showQR && inviteLink && (
+                      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+                        <img
+                          src={generateQRCode(inviteLink)}
+                          alt="QR Code"
+                          style={{ maxWidth: '200px', border: '2px solid #333', borderRadius: 8 }}
+                          onLoad={() => console.log('[QR] Image loaded')}
+                          onError={(e) => console.error('[QR] Image failed:', e)}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
                 <div style={{ opacity: 0.6, fontSize: 10 }}>
                   They paste it in their browser or scan QR code
