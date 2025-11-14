@@ -56,7 +56,6 @@ async function tryConnectWorker(
     };
     
     ws.onerror = (err) => {
-      console.error('[SIMPLEPEER] WebSocket error:', err);
       reject(err);
     };
     

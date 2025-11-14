@@ -120,7 +120,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         destroy();
         if (invitePeerId) {
           setTimeout(() => {
-            window.location.href = '/';
+            window.location.href = '/chat';
           }, 2000);
         }
       };
