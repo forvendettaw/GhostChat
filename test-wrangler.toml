@@ -1,0 +1,11 @@
+name = "test-peerjs-server"
+main = "test-peerjs-worker.js"
+compatibility_date = "2024-01-01"
+
+[[durable_objects.bindings]]
+name = "PEER_SESSION"
+class_name = "PeerSession"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["PeerSession"]

@@ -58,7 +58,30 @@ location.reload();
 
 ## Self-Hosting PeerJS Server
 
-### Quick Start with Docker
+### Option 1: Cloudflare Workers (Recommended - Free)
+
+```bash
+cd cloudflare-worker
+npx wrangler login
+npx wrangler deploy
+```
+
+Your server: `https://ghostchat-signaling.YOUR-SUBDOMAIN.workers.dev`
+
+**Benefits:**
+- Free tier: 100K requests/day
+- Global edge network
+- No cold starts
+- Zero maintenance
+- Built-in SSL
+
+**Configure in GhostChat:**
+- Host: `ghostchat-signaling.YOUR-SUBDOMAIN.workers.dev`
+- Port: `443`
+- Path: `/peerjs`
+- Key: `peerjs`
+
+### Option 2: Docker (Self-Hosted)
 
 ```bash
 # Run PeerJS server
@@ -77,6 +100,8 @@ docker run -d \
 ```
 
 ### Deploy on Cloud
+
+**Cloudflare Workers (see Option 1 above)**
 
 **Heroku:**
 ```bash
@@ -152,16 +177,15 @@ Users can share their PeerJS servers with the community:
 
 ## Cost Estimates
 
-**Self-Hosting Costs:**
+**Free Options:**
+- Cloudflare Workers: Free (100K requests/day)
+- PeerJS Cloud (default): Free for reasonable usage
+
+**Paid Self-Hosting:**
 - DigitalOcean Droplet: $5-10/month
 - AWS EC2 t2.micro: ~$8/month
 - Heroku Hobby: $7/month
 - VPS providers: $3-10/month
-
-**Free Tier (Default):**
-- PeerJS Cloud: Free for reasonable usage
-- No credit card required
-- Good for personal use
 
 ## Troubleshooting
 

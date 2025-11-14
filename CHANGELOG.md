@@ -2,6 +2,31 @@
 
 All notable changes to GhostChat will be documented in this file.
 
+## [0.2.2] - 2025-11-14 (Alpha)
+
+### Added
+- **Custom PeerJS server implementation** using Cloudflare Workers + Durable Objects
+- WebSocket-based signaling with OPEN/OFFER/ANSWER/CANDIDATE message handling
+- HTTP endpoint for peer ID generation
+- CORS support for cross-origin requests
+- Test suite (test-worker-peerjs.html) for validating server deployment
+- SQLite-based Durable Objects for free tier compatibility
+
+### Changed
+- Cloudflare Worker now uses custom PeerJS protocol instead of third-party package
+- Server path updated to `/peerjs` for PeerJS client compatibility
+- Removed `peer` npm dependency (incompatible with Workers)
+
+### Fixed
+- CORS errors blocking cross-origin WebSocket connections
+- Peer ID format (returns JSON string instead of object)
+- Durable Objects migration for free tier deployment
+
+### Documentation
+- Updated cloudflare-worker/README.md with deployment and testing instructions
+- Updated CUSTOM-SERVER.md with Cloudflare Workers as recommended option
+- Added architecture overview and free tier details
+
 ## [0.2.1] - 2025-11-14 (Alpha Hotfix)
 
 ### Fixed
