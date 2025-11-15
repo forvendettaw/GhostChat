@@ -24,6 +24,7 @@ import { containsSensitiveContent } from "@/lib/sensitive-content";
 import { generateFingerprint } from "@/lib/connection-fingerprint";
 import { stripImageMetadata } from "@/lib/metadata-stripper";
 
+
 import ErrorHandler from "./ErrorHandler";
 import ConnectionStatus from "./ConnectionStatus";
 import InviteSection from "./InviteSection";
@@ -88,6 +89,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const lastActivity = React.useRef(Date.now());
   const typingDelayTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const fakeTrafficInterval = React.useRef<NodeJS.Timeout | null>(null);
+  const idleBlurTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const uptimeInterval = setInterval(() => {
@@ -269,13 +271,18 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
 
       const resetInactivity = () => {
         lastActivity.current = Date.now();
+        document.body.style.filter = "none";
         if (inactivityTimeout.current) clearTimeout(inactivityTimeout.current);
+        if (idleBlurTimeout.current) clearTimeout(idleBlurTimeout.current);
         if (connected && sessionTimeout > 0) {
           inactivityTimeout.current = setTimeout(() => {
             destroy();
             window.location.href = '/chat';
           }, sessionTimeout * 60000);
         }
+        idleBlurTimeout.current = setTimeout(() => {
+          document.body.style.filter = "blur(10px)";
+        }, 30000);
       };
 
       const handlePanic = (e: KeyboardEvent) => {
@@ -297,6 +304,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         clearInterval(expiryInterval);
         if (inactivityTimeout.current) clearTimeout(inactivityTimeout.current);
         if (fakeTrafficInterval.current) clearTimeout(fakeTrafficInterval.current);
+        if (idleBlurTimeout.current) clearTimeout(idleBlurTimeout.current);
         destroy();
         clearSession();
         document.removeEventListener('visibilitychange', handleVisibilityChange);
