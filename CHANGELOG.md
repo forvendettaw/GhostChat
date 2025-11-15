@@ -8,6 +8,7 @@
 
 ### Changed
 - **README Enhancement**: Improved visual presentation with screenshot gallery
+- **Deployment**: Configured automatic deployment via GitHub Actions on push to master
 
 ---
 
