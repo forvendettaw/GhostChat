@@ -66,6 +66,9 @@ GhostChat is a truly private chat app where messages travel directly between you
 ### Key Features
 
 - **Direct P2P**: Messages and files never touch servers
+- **Markdown Support**: Rich text formatting (bold, italic, code, links, images, etc.)
+- **Quick Emojis**: 15 one-click emoji buttons
+- **Sound Notifications**: Audio alert on new messages
 - **Typing Indicators**: See when peer is typing
 - **Clickable Links**: URLs automatically become clickable
 - **File Sharing**: Send files up to 10MB directly P2P
@@ -396,8 +399,12 @@ Yes, that's how P2P works. Use a VPN to mask your IP if needed.
 **Cost**: $0 forever (free tier infrastructure)  
 **Capacity**: 200,000 requests/day (~10,000 chat sessions)
 
-**✨ v0.4.1 Features**:
+**✨ v0.5.0 Features**:
 
+- Quick emoji picker (15 emojis inline)
+- Markdown formatting (16 buttons: H1-H3, Bold, Italic, Underline, Strikethrough, Highlight, Code, Code Block, Link, Image, Superscript, Subscript, HR, Table)
+- Notification sound on message receive
+- Cross-browser tooltips (Firefox + Chromium)
 - Typing indicators ("Peer is typing...")
 - Auto-scroll to latest message
 - Clickable URLs in messages
@@ -405,7 +412,6 @@ Yes, that's how P2P works. Use a VPN to mask your IP if needed.
 - Click message to copy text
 - Improved disconnect handling
 - Faster disconnect detection (1-2 seconds)
-- Cleaner error messages
 
 **⚠️ Limitations**:
 

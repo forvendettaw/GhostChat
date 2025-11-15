@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { parseMarkdown } from "@/lib/markdown";
 
 interface Message {
   text: string;
@@ -96,10 +97,7 @@ export default function MessageList({ messages }: MessageListProps) {
             ) : msg.text ? (
               <span
                 dangerouslySetInnerHTML={{
-                  __html: msg.text.replace(
-                    /(https?:\/\/[^\s]+)/g,
-                    '<a href="$1" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline">$1</a>'
-                  ),
+                  __html: parseMarkdown(msg.text),
                 }}
               />
             ) : null}

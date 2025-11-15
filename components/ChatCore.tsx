@@ -19,6 +19,7 @@ import {
   deserializeFileMessage,
   serializeFileMessage,
 } from "@/lib/file-transfer";
+import { playNotificationSound, initAudioContext } from "@/lib/notification-sound";
 import ErrorHandler from "./ErrorHandler";
 import ConnectionStatus from "./ConnectionStatus";
 import InviteSection from "./InviteSection";
@@ -104,11 +105,13 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         } catch {}
         storeMessage({ text: data, peerId: fromPeerId, isSelf: false });
         setMessages(getMessages().slice());
+        playNotificationSound();
       };
 
       const handleConnect = () => {
         setConnected(true);
         setConnecting(false);
+        initAudioContext();
         if (connectionTimeout.current) {
           clearTimeout(connectionTimeout.current);
           connectionTimeout.current = null;
@@ -123,11 +126,9 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         setConnected(false);
         setConnecting(false);
         destroy();
-        if (invitePeerId) {
-          setTimeout(() => {
-            window.location.href = '/chat';
-          }, 2000);
-        }
+        setTimeout(() => {
+          window.location.href = '/chat';
+        }, 2000);
       };
 
       const handleFallback = () => {
