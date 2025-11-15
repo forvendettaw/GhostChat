@@ -12,7 +12,7 @@ No servers storing or reading your conversations. Everything exists only in memo
 [![WebRTC](https://img.shields.io/badge/WebRTC-P2P-orange)](https://webrtc.org)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Live Demo](https://ghostchat.example.com) • [Documentation](#documentation) • [Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
+[Live Demo](https://ghost-chat.pages.dev) • [Documentation](#documentation) • [Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -89,7 +89,7 @@ Most "secure" messaging apps still store your messages on servers. Even Signal a
 **1. Visit the app:**
 
 ```
-https://ghostchat.example.com
+https://ghost-chat.pages.dev
 ```
 
 **2. Create a room:**
@@ -234,13 +234,83 @@ ghostchat/
 - ❌ IP address exposure (peers see each other's IPs - use VPN)
 - ❌ Browser vulnerabilities (keep browser updated)
 
+### Man-in-the-Middle (MITM) Attack Vectors
+
+GhostChat is vulnerable to MITM attacks during the initial connection phase. Here's how:
+
+**1. Signaling Server Compromise**
+- The Cloudflare Worker facilitates WebRTC handshake (SDP exchange)
+- A compromised signaling server could intercept and modify:
+  - Session Description Protocol (SDP) offers/answers
+  - ICE candidates (connection endpoints)
+  - Encryption keys during negotiation
+- Result: Attacker establishes two separate connections (A↔Attacker↔B)
+
+**2. Invite Link Interception**
+- Invite links contain the peer ID: `https://ghost-chat.pages.dev/chat?peer=abc123`
+- If shared via insecure channel (SMS, unencrypted email, public chat):
+  - Attacker intercepts link and connects first
+  - Original recipient connects to attacker instead of intended peer
+- Result: Both parties unknowingly chat with the attacker
+
+**3. Network-Level Attack**
+- Attacker on same WiFi/network can:
+  - Perform DNS spoofing to redirect traffic
+  - Intercept WebRTC negotiation packets
+  - Inject malicious ICE candidates
+- Result: Traffic routed through attacker's machine
+
+### MITM Protection: Connection Fingerprint
+
+GhostChat includes a **connection fingerprint** system to detect MITM attacks:
+
+```
+🔴🟢🔵🟡  ← 4-emoji hash
+123456     ← 6-digit verification code
+```
+
+**How it works:**
+1. Both peers generate a deterministic hash from their peer IDs
+2. Hash is displayed as 4 emojis + 6-digit code
+3. **If connection is direct:** Both see IDENTICAL fingerprint
+4. **If MITM present:** Each sees DIFFERENT fingerprint (because attacker has different peer ID)
+
+**Example:**
+```
+Direct Connection:
+  Alice sees: 🔴🟢🔵🟡 (hash of Alice+Bob)
+  Bob sees:   🔴🟢🔵🟡 (hash of Alice+Bob) ✅ MATCH
+
+MITM Attack:
+  Alice sees: 🔴🟢🔵🟡 (hash of Alice+Attacker)
+  Bob sees:   🟣🟠⚫🔶 (hash of Bob+Attacker) ❌ MISMATCH
+```
+
 ### Security Best Practices
 
-1. **Verify connection fingerprint** - Compare 4-emoji hash out-of-band
-2. **Use VPN** - Hide your IP address from peer
-3. **Secure device** - Keep OS and browser updated
-4. **Private browsing** - Use incognito/private mode
-5. **Trusted network** - Avoid public WiFi without VPN
+**CRITICAL: Always verify fingerprint out-of-band**
+
+1. **Verify connection fingerprint** - Compare 4-emoji hash via separate channel:
+   - Phone call (read emojis aloud)
+   - Video call (show screen)
+   - In-person verification
+   - Signal/WhatsApp message (different channel than invite link)
+   - **DO NOT** verify via the same channel you shared the invite link
+
+2. **Share invite links securely**
+   - Use end-to-end encrypted messaging (Signal, WhatsApp)
+   - Share in person (QR code scan)
+   - Avoid SMS, email, public forums
+
+3. **Use VPN** - Hide your IP address from peer and network observers
+
+4. **Secure device** - Keep OS and browser updated
+
+5. **Private browsing** - Use incognito/private mode
+
+6. **Trusted network** - Avoid public WiFi without VPN
+
+7. **Fresh session** - Create new room for each conversation (don't reuse peer IDs)
 
 ### Security Audits
 
@@ -386,6 +456,6 @@ If you find GhostChat useful, please:
 
 **Built with ❤️ for privacy**
 
-[Website](https://ghostchat.example.com) • [GitHub](https://github.com/teycir/ghostchat) • [Twitter](https://twitter.com/ghostchatapp)
+[Website](https://ghost-chat.pages.dev) • [GitHub](https://github.com/teycir/ghostchat) • [Twitter](https://twitter.com/ghostchatapp)
 
 </div>

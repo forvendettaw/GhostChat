@@ -5,4 +5,4 @@ export $(cat .env.local | xargs)
 
 npm run build
 
-npx wrangler pages deploy out --project-name=ghostchat
+npx wrangler pages deploy out --project-name=ghost-chat
