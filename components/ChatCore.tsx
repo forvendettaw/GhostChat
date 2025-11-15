@@ -200,7 +200,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         peerConnection.current = null;
         destroy();
         setTimeout(() => {
-          window.location.href = '/chat';
+          window.location.href = '/';
         }, 2000);
       };
 
