@@ -138,21 +138,31 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             return;
           }
           if (parsed.type === "panic") return;
-
           if (parsed.type === "noise") return;
-          if (parsed.type === "file-chunk" || parsed.type === "file") return;
+          
+          // Handle file chunks - don't return early!
+          if (parsed.type === "file-chunk" || parsed.type === "file") {
+            const fileData = deserializeFileMessage(data);
+            if (fileData) {
+              console.log(`[FILE] Received file: ${fileData.name}, size: ${fileData.size} bytes`);
+              const id = crypto.randomUUID();
+              storeMessage({ id, text: "", peerId: fromPeerId, isSelf: false, file: fileData });
+              setMessages(getMessages().slice());
+            }
+            return;
+          }
+          
           // If we reach here with unknown type, ignore it
           return;
         } catch {
-          // If JSON parsing fails, check if it's a file or just ignore
-        }
-        const fileData = deserializeFileMessage(data);
-        if (fileData) {
-          console.log(`[FILE] Received file: ${fileData.name}, size: ${fileData.size} bytes`);
-          const id = crypto.randomUUID();
-          storeMessage({ id, text: "", peerId: fromPeerId, isSelf: false, file: fileData });
-          setMessages(getMessages().slice());
-          return;
+          // If JSON parsing fails, try deserializing as file
+          const fileData = deserializeFileMessage(data);
+          if (fileData) {
+            console.log(`[FILE] Received file: ${fileData.name}, size: ${fileData.size} bytes`);
+            const id = crypto.randomUUID();
+            storeMessage({ id, text: "", peerId: fromPeerId, isSelf: false, file: fileData });
+            setMessages(getMessages().slice());
+          }
         }
         // Ignore any other non-JSON data (likely noise or malformed packets)
       };
@@ -393,16 +403,26 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     if (connected) {
       setUploadProgress({ fileName: file.name, sent: 0, total: chunks.length });
       try {
-        chunks.forEach((chunk, i) => {
-          console.log(`[FILE] Sending chunk ${i + 1}/${chunks.length}, size: ${chunk.length} bytes`);
-          sendToAll(chunk);
-          setUploadProgress({
-            fileName: file.name,
-            sent: i + 1,
-            total: chunks.length,
-          });
+        const sendChunks = async () => {
+          for (let i = 0; i < chunks.length; i++) {
+            console.log(`[FILE] Sending chunk ${i + 1}/${chunks.length}, size: ${chunks[i].length} bytes`);
+            sendToAll(chunks[i]);
+            setUploadProgress({
+              fileName: file.name,
+              sent: i + 1,
+              total: chunks.length,
+            });
+            if (i < chunks.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 50));
+            }
+          }
+          setTimeout(() => setUploadProgress(null), 2000);
+        };
+        sendChunks().catch(err => {
+          console.error('[FILE] Send failed:', err);
+          setError('Failed to send file. Try a smaller file.');
+          setUploadProgress(null);
         });
-        setTimeout(() => setUploadProgress(null), 2000);
       } catch (err) {
         console.error('[FILE] Send failed:', err);
         setError('Failed to send file. Try a smaller file.');
