@@ -10,7 +10,21 @@ export default function Home() {
       <div style={{ textAlign: "center", maxWidth: "90%" }}>
         <img src="/assets/ghostNobg.png" alt="Ghost" style={{ width: "120px", height: "120px", marginBottom: 20 }} className="ghost-icon" />
         <h1 style={{ fontSize: "clamp(32px, 8vw, 48px)", marginBottom: 12, fontWeight: 700 }}>GhostChat</h1>
-        <p style={{ fontSize: "clamp(14px, 3vw, 18px)", opacity: 0.7, marginBottom: 32 }} className="vanish-text">Your messages vanish like ghosts</p>
+        <p style={{ fontSize: "clamp(14px, 3vw, 18px)", opacity: 0.7, marginBottom: 16 }} className="vanish-text">Your messages vanish like ghosts</p>
+        <div style={{ 
+          maxWidth: "400px", 
+          margin: "0 auto 24px", 
+          padding: "12px 16px", 
+          background: "rgba(255, 255, 255, 0.05)", 
+          borderRadius: 8,
+          border: "1px solid rgba(255, 255, 255, 0.1)"
+        }}>
+          <p style={{ fontSize: "11px", color: "#fff", opacity: 0.8, margin: 0, lineHeight: 1.6 }}>
+            1. Click "Start Chatting" → Copy your link<br/>
+            2. Peer pastes link in address bar<br/>
+            3. You're connected - chat vanishes on close
+          </p>
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
           <button
             onClick={() => router.push("/chat")}
