@@ -23,6 +23,7 @@ import { playNotificationSound, initAudioContext } from "@/lib/notification-soun
 import { containsSensitiveContent } from "@/lib/sensitive-content";
 import { generateFingerprint } from "@/lib/connection-fingerprint";
 import { stripImageMetadata } from "@/lib/metadata-stripper";
+
 import ErrorHandler from "./ErrorHandler";
 import ConnectionStatus from "./ConnectionStatus";
 import InviteSection from "./InviteSection";
@@ -75,12 +76,18 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [messageLimit, setMessageLimit] = useState<number>(50);
   const [remotePeerId, setRemotePeerId] = useState<string>("");
   const [fingerprint, setFingerprint] = useState<string>("");
+  const [sessionTimeout, setSessionTimeout] = useState<number>(15);
+  const [verificationCode, setVerificationCode] = useState<string>("");
 
   const initialized = React.useRef(false);
   const peerConnection = React.useRef<any>(null);
   const startTime = React.useRef(Date.now());
   const typingTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const connectionTimeout = React.useRef<NodeJS.Timeout | null>(null);
+  const inactivityTimeout = React.useRef<NodeJS.Timeout | null>(null);
+  const lastActivity = React.useRef(Date.now());
+  const typingDelayTimeout = React.useRef<NodeJS.Timeout | null>(null);
+  const fakeTrafficInterval = React.useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const uptimeInterval = setInterval(() => {
@@ -124,13 +131,15 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             sendToAll(JSON.stringify({ type: "read", id: parsed.id }));
             return;
           }
-          if (parsed.type === "panic") {
-            getMessages().forEach(m => deleteMessage(m.id));
-            setMessages([]);
-            return;
-          }
+          if (parsed.type === "panic") return;
+
+          if (parsed.type === "noise") return;
           if (parsed.type === "file-chunk" || parsed.type === "file") return;
-        } catch {}
+          // If we reach here with unknown type, ignore it
+          return;
+        } catch {
+          // If JSON parsing fails, check if it's a file or just ignore
+        }
         const fileData = deserializeFileMessage(data);
         if (fileData) {
           const id = crypto.randomUUID();
@@ -138,10 +147,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           setMessages(getMessages().slice());
           return;
         }
-        const id = crypto.randomUUID();
-        storeMessage({ id, text: data, peerId: fromPeerId, isSelf: false });
-        setMessages(getMessages().slice());
-        playNotificationSound();
+        // Ignore any other non-JSON data (likely noise or malformed packets)
       };
 
       const handleConnect = (peer?: any) => {
@@ -161,9 +167,13 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           const remote = peer.peer || invitePeerId || '';
           setRemotePeerId(remote);
           if (peerId && remote) {
-            setFingerprint(generateFingerprint(peerId, remote));
+            const fp = generateFingerprint(peerId, remote);
+            setFingerprint(fp);
+            const code = String(Math.abs(fp.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 1000000)).padStart(6, '0');
+            setVerificationCode(code);
           }
         }
+        startFakeTraffic();
       };
 
       const handleDisconnect = (reason?: string) => {
@@ -245,27 +255,59 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         if (changed) setMessages(getMessages().slice());
       }, 1000);
 
+      const startFakeTraffic = () => {
+        if (fakeTrafficInterval.current) clearInterval(fakeTrafficInterval.current);
+        const sendNoise = () => {
+          if (connected) {
+            sendToAll(JSON.stringify({ type: "noise", data: Math.random().toString(36) }));
+          }
+          const delay = 3000 + Math.random() * 2000;
+          fakeTrafficInterval.current = setTimeout(sendNoise, delay);
+        };
+        sendNoise();
+      };
+
+      const resetInactivity = () => {
+        lastActivity.current = Date.now();
+        if (inactivityTimeout.current) clearTimeout(inactivityTimeout.current);
+        if (connected && sessionTimeout > 0) {
+          inactivityTimeout.current = setTimeout(() => {
+            destroy();
+            window.location.href = '/chat';
+          }, sessionTimeout * 60000);
+        }
+      };
+
       const handlePanic = (e: KeyboardEvent) => {
         if (e.ctrlKey && e.shiftKey && e.key === 'X') {
           e.preventDefault();
           getMessages().forEach(m => deleteMessage(m.id));
           setMessages([]);
-          if (connected) sendToAll(JSON.stringify({ type: "panic" }));
         }
       };
+
       document.addEventListener('keydown', handlePanic);
+      document.addEventListener('mousedown', resetInactivity);
+      document.addEventListener('keydown', resetInactivity);
+      resetInactivity();
 
       return () => {
         clearInterval(uptimeInterval);
         clearInterval(latencyInterval);
         clearInterval(expiryInterval);
+        if (inactivityTimeout.current) clearTimeout(inactivityTimeout.current);
+        if (fakeTrafficInterval.current) clearTimeout(fakeTrafficInterval.current);
         destroy();
         clearSession();
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         document.removeEventListener('keydown', handlePanic);
+        document.removeEventListener('mousedown', resetInactivity);
+        document.removeEventListener('keydown', resetInactivity);
       };
     })();
   }, []);
+
+
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -381,42 +423,46 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           position: "relative",
         }}
       >
-        <div style={{ position: "absolute", left: 16 }}>
-          <div style={{ fontSize: 12, opacity: 0.6 }}>
-            Your ID: {peerId.slice(0, 8)}...
-          </div>
+        <div style={{ position: "absolute", left: 16, fontSize: 12, opacity: 0.6 }}>
+          Your ID: {peerId.slice(0, 8)}...
         </div>
         <button
           onClick={() => {
             getMessages().forEach(m => deleteMessage(m.id));
             setMessages([]);
-            if (connected) sendToAll(JSON.stringify({ type: "panic" }));
           }}
           className="tooltip-btn-bottom"
-          data-title="Panic: Clear all messages (Ctrl+Shift+X)"
+          data-title="Clear all messages (Ctrl+Shift+X)"
           style={{
-            position: "relative",
-            background: "#f00",
-            color: "#fff",
+            background: "#fd0",
+            color: "#000",
             border: "none",
             borderRadius: 6,
             padding: "8px 24px",
-            fontSize: 12,
             cursor: "pointer",
             fontWeight: 700,
-            letterSpacing: "0.5px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          🚨 PANIC
+          <span style={{ fontSize: 18 }}>🚨</span>
+          <span style={{ fontSize: 10 }}>CLEAR ALL</span>
         </button>
       </div>
       <div style={{ padding: "0 16px 16px" }}>
         <ConnectionStatus connected={connected} connecting={connecting} latency={latency} />
         {fingerprint && (
           <div style={{ marginTop: 8, padding: 8, background: "#1a1a1a", borderRadius: 6, fontSize: 10, textAlign: "center" }}>
-            <span style={{ opacity: 0.6 }}>Connection fingerprint: </span>
-            <span style={{ fontSize: 16, letterSpacing: 2 }}>{fingerprint}</span>
-            <div style={{ opacity: 0.5, fontSize: 9, marginTop: 4 }}>Verify peer sees same fingerprint</div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ opacity: 0.6 }}>Fingerprint: </span>
+              <span style={{ fontSize: 16, letterSpacing: 2 }}>{fingerprint}</span>
+            </div>
+            <div>
+              <span style={{ opacity: 0.6 }}>Verification code: </span>
+              <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 3, color: "#0f0" }}>{verificationCode}</span>
+            </div>
+            <div style={{ opacity: 0.5, fontSize: 9, marginTop: 4 }}>Verify peer sees same code (out-of-band)</div>
           </div>
         )}
         <InviteSection
@@ -513,6 +559,29 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             <option value={100}>100</option>
           </select>
         </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <label style={{ fontSize: 10, opacity: 0.6, whiteSpace: "nowrap" }}>Timeout:</label>
+          <select
+            value={sessionTimeout}
+            onChange={(e) => setSessionTimeout(Number(e.target.value))}
+            style={{
+              background: "#111",
+              color: "#fff",
+              border: "1px solid #333",
+              borderRadius: 4,
+              padding: "4px 8px",
+              fontSize: 10,
+              cursor: "pointer",
+            }}
+          >
+            <option value={0}>Never</option>
+            <option value={5}>5m</option>
+            <option value={15}>15m</option>
+            <option value={30}>30m</option>
+            <option value={60}>1h</option>
+          </select>
+        </div>
+
       </div>
       <MessageInput
         input={input}
@@ -520,7 +589,13 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         connected={connected}
         onSend={sendMessage}
         onFileSelect={handleFileSelect}
-        onTyping={() => connected && sendToAll("__typing__")}
+        onTyping={() => {
+          if (!connected) return;
+          if (typingDelayTimeout.current) clearTimeout(typingDelayTimeout.current);
+          typingDelayTimeout.current = setTimeout(() => {
+            sendToAll("__typing__");
+          }, Math.random() * 300);
+        }}
       />
       <DiagnosticsFooter
         connected={connected}

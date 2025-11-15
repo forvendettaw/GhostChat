@@ -1,18 +1,51 @@
 # Changelog
 
+## [0.7.0] - 2025-01-18
+
+### Changed
+- **Panic Button Simplified**: Removed decoy messages and fake traffic features
+- **Local-Only Panic**: Panic button now only clears local messages (no P2P sync)
+- **Improved UI**: Panic button with larger emoji icon (18px), smaller text (10px), bright yellow background (#fd0)
+
+### Removed
+- Decoy message generation feature
+- Fake traffic obfuscation feature
+- P2P panic synchronization
+- Typing obfuscation delays
+- Screenshot detection (browser security limitation - PrintScreen key events are blocked by OS/browser)
+
+### Technical
+- Removed `useDecoy` and `fakeTraffic` state variables
+- Removed `fakeTrafficInterval` ref and related useEffect
+- Removed `screenshotAlert` state and UI banner
+- Removed decoy message generation logic from panic handler
+- Simplified panic protocol (no longer sends panic type to peer)
+- Removed noise packet handling from message protocol
+- Removed screenshot event listeners (non-functional due to browser security)
+
+### Note
+- Screenshot detection is technically impossible in browsers - PrintScreen key events are intentionally blocked by the OS/browser for user privacy
+
+---
+
 ## [0.6.0] - 2025-01-17
 
 ### Added - Privacy & Security Features
 - **Self-Destructing Messages**: Timer dropdown (5s, 30s, 1m, 5m, Never) with countdown display
 - **Message Deletion**: Delete button on each message, synced P2P deletion for both sides
 - **Read Receipts**: Single checkmark (sent), double checkmark (read) on messages
-- **Panic Button**: Red button in header + Ctrl+Shift+X keyboard shortcut to clear all messages
+- **Panic Button**: Yellow button in header + Ctrl+Shift+X keyboard shortcut to clear all messages
 - **Sensitive Content Blur**: Auto-detect and blur passwords, SSN, credit cards, API keys, secrets
 - **Connection Fingerprint**: 4-emoji hash displayed to verify no MITM attack
 - **Clipboard Auto-Clear**: Copied messages auto-cleared from clipboard after 10 seconds
 - **Metadata Stripping**: EXIF data removed from images via canvas re-encoding
 - **Anti-Forensics Memory Overwrite**: Deleted messages overwritten with random data
 - **Message Limit**: Dropdown to set max messages (10, 25, 50, 100) with auto-cleanup
+- **Session Timeout**: Auto-disconnect after inactivity (5m, 15m, 30m, 1h, Never)
+- **Screenshot Detection**: Alerts when peer takes screenshot (Page Visibility API)
+- **Decoy Messages**: Optional fake innocent messages on panic
+- **Fake Traffic**: Optional dummy packet generation for traffic obfuscation
+- **Typing Obfuscation**: Random delays on typing indicators
 
 ### Changed
 - **Message Interface**: Added id, read, expiresAt, createdAt, sensitive fields
