@@ -65,6 +65,20 @@ Most "secure" messaging apps still store your messages on servers. Even Signal a
 
 ---
 
+## 📊 Comparison
+
+| Feature                      | GhostChat | Signal      | WhatsApp    | Telegram    |
+| ---------------------------- | --------- | ----------- | ----------- | ----------- |
+| **True P2P**                 | ✅ Yes    | ❌ No       | ❌ No       | ❌ No       |
+| **No server storage**        | ✅ Yes    | ❌ Metadata | ❌ Metadata | ❌ Messages |
+| **Does not require account** | ✅ Yes    | ❌ Phone    | ❌ Phone    | ❌ Phone    |
+| **No logs**                  | ✅ Yes    | ❌ No       | ❌ No       | ❌ No       |
+| **Self-destruct**            | ✅ Yes    | ✅ Yes      | ❌ No       | ✅ Yes      |
+| **Open source**              | ✅ Yes    | ✅ Yes      | ❌ No       | ❌ Partial  |
+| **Cost**                     | 💰 Free   | 💰 Free     | 💰 Free     | 💰 Free     |
+
+---
+
 ## ✨ Features
 
 ### 🔒 Privacy & Security
@@ -367,20 +381,6 @@ MITM Attack:
 - [ ] Bug bounty program (planned)
 
 **Found a vulnerability?** Please report responsibly to [teycir@pxdmail.net](mailto:teycir@pxdmail.net)
-
----
-
-## 📊 Comparison
-
-| Feature                      | GhostChat | Signal      | WhatsApp    | Telegram    |
-| ---------------------------- | --------- | ----------- | ----------- | ----------- |
-| **True P2P**                 | ✅ Yes    | ❌ No       | ❌ No       | ❌ No       |
-| **No server storage**        | ✅ Yes    | ❌ Metadata | ❌ Metadata | ❌ Messages |
-| **Does not require account** | ✅ Yes    | ❌ Phone    | ❌ Phone    | ❌ Phone    |
-| **Logs messages**            | ❌ No     | ✅ Yes      | ✅ Yes      | ✅ Yes      |
-| **Self-destruct**            | ✅ Yes    | ✅ Yes      | ❌ No       | ✅ Yes      |
-| **Open source**              | ✅ Yes    | ✅ Yes      | ❌ No       | ❌ Partial  |
-| **Cost**                     | 💰 Free   | 💰 Free     | 💰 Free     | 💰 Free     |
 
 ---
 
