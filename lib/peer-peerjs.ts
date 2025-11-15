@@ -14,7 +14,7 @@ const CONFIG = {
 export async function initPeerJS(
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -47,7 +47,7 @@ function setupConnection(
   conn: DataConnection,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ) {
   connections.set(conn.peer, conn);
 
@@ -81,7 +81,7 @@ export function connectPeerJS(
   remotePeerId: string,
   onMessage: (peerId: string, data: string) => void,
   onConnect: () => void,
-  onDisconnect?: () => void
+  onDisconnect?: (reason?: string) => void
 ) {
   if (!peer) throw new Error('Peer not initialized');
   
