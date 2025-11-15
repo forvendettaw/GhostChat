@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.9.4] - 2025-01-15
+
+### Added
+- **Social Share Buttons**: Twitter, Reddit, and LinkedIn share buttons on landing page
+- **SEO Optimization**: Enhanced meta tags with keywords, Open Graph, and Twitter Cards
+- **Sitemap**: Dynamic sitemap.xml for search engine indexing
+- **Robots.txt**: Added robots.txt for crawler configuration
+
+### Changed
+- **Meta Title**: Optimized with keywords "Secure P2P Chat | WebRTC Messaging | No Server Storage"
+- **Meta Description**: Enhanced with tech stack mentions (Next.js, TypeScript)
+- **Open Graph Images**: Added proper OG image with dimensions for social sharing
+
+### Fixed
+- **Sitemap Build**: Added dynamic export config for static sitemap generation
+
+---
+
 ## [0.9.3] - 2025-01-15
 
 ### Added
