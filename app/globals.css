@@ -311,12 +311,13 @@ select option {
 }
 
 select option:checked {
-  background: linear-gradient(135deg, #fd0 0%, #fa0 100%);
+  background: #fd0;
   color: #000;
+  font-weight: 700;
 }
 
 select option:hover {
-  background: linear-gradient(135deg, #fd0 0%, #fa0 100%) !important;
+  background: #fa0 !important;
   color: #000 !important;
 }
 
