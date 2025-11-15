@@ -562,7 +562,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       </div>
 
       {uploadProgress && <UploadProgress {...uploadProgress} />}
-      <div style={{ borderTop: "1px solid #333", padding: "8px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+      <div style={{ borderTop: "1px solid #333", padding: "8px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", maxWidth: "100%", overflow: "hidden" }}>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <label style={{ fontSize: 10, opacity: 0.6, whiteSpace: "nowrap" }}>Self-destruct:</label>
           <select
