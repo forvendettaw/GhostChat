@@ -16,6 +16,8 @@ No servers storing or reading your conversations. Everything exists only in memo
 
 [Live Demo](https://ghost-chat.pages.dev) • [Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
 
+**🎥 [Watch Demo Video](https://sendspark.com/share/jq2rruwx9q3s97gbswef1sabm09ofzye)**
+
 </div>
 
 ---
