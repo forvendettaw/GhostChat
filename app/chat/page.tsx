@@ -24,18 +24,15 @@ function ChatContent() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
-        background: '#000',
         color: '#fff'
       }}>
         <img
           src="/assets/ghostNobg.png"
           alt="Ghost"
-          width={180}
-          height={180}
-          style={{ marginBottom: 30, opacity: 0.9, animation: 'float 3s ease-in-out infinite' }}
+          style={{ width: 'clamp(120px, 25vw, 180px)', height: 'auto', marginBottom: 30, opacity: 0.9, animation: 'float 3s ease-in-out infinite' }}
         />
         <h1 style={{
-          fontSize: 64,
+          fontSize: 'clamp(36px, 10vw, 64px)',
           marginBottom: 16,
           fontWeight: 700,
           letterSpacing: -1
@@ -43,9 +40,9 @@ function ChatContent() {
           GhostChat
         </h1>
         <p style={{
-          fontSize: 22,
+          fontSize: 'clamp(16px, 4vw, 22px)',
           marginBottom: 50,
-          maxWidth: 500,
+          maxWidth: '90%',
           textAlign: 'center',
           lineHeight: 1.5,
           animation: 'vanishOnce 24s ease-out forwards'
@@ -54,17 +51,7 @@ function ChatContent() {
         </p>
         <button
           onClick={() => setJoined(true)}
-          style={{
-            padding: '18px 48px',
-            background: '#fff',
-            color: '#000',
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 600,
-            fontSize: 18,
-            cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(255,255,255,0.1)'
-          }}
+          className="start-btn"
         >
           Start Chatting
         </button>

@@ -28,7 +28,7 @@ export default function InviteSection({
           disabled={!peerId}
           style={{
             padding: "6px 12px",
-            background: peerId ? "#fff" : "#333",
+            background: peerId ? "linear-gradient(135deg, #fff 0%, #eee 100%)" : "linear-gradient(135deg, #333 0%, #222 100%)",
             border: "none",
             borderRadius: 8,
             color: peerId ? "#000" : "#666",
@@ -80,7 +80,7 @@ export default function InviteSection({
                   }}
                   style={{
                     padding: "6px 12px",
-                    background: copied ? "#fd0" : "#fff",
+                    background: copied ? "linear-gradient(135deg, #fd0 0%, #fa0 100%)" : "linear-gradient(135deg, #fff 0%, #eee 100%)",
                     border: "none",
                     borderRadius: 6,
                     color: "#000",
@@ -95,7 +95,7 @@ export default function InviteSection({
                   onClick={() => setShowQR(!showQR)}
                   style={{
                     padding: "6px 12px",
-                    background: "#333",
+                    background: "linear-gradient(135deg, #444 0%, #333 100%)",
                     border: "none",
                     borderRadius: 6,
                     color: "#fff",

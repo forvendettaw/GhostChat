@@ -133,6 +133,10 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             sendToAll(JSON.stringify({ type: "read", id: parsed.id }));
             return;
           }
+          if (parsed.type === "disconnect") {
+            handleDisconnect("Peer disconnected");
+            return;
+          }
           if (parsed.type === "panic") return;
 
           if (parsed.type === "noise") return;
@@ -298,7 +302,17 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       document.addEventListener('keydown', resetInactivity);
       resetInactivity();
 
+      const handleBeforeUnload = () => {
+        if (connected) {
+          sendToAll(JSON.stringify({ type: "disconnect" }));
+        }
+      };
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
       return () => {
+        if (connected) {
+          sendToAll(JSON.stringify({ type: "disconnect" }));
+        }
         clearInterval(uptimeInterval);
         clearInterval(latencyInterval);
         clearInterval(expiryInterval);
@@ -307,6 +321,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         if (idleBlurTimeout.current) clearTimeout(idleBlurTimeout.current);
         destroy();
         clearSession();
+        window.removeEventListener('beforeunload', handleBeforeUnload);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         document.removeEventListener('keydown', handlePanic);
         document.removeEventListener('mousedown', resetInactivity);
@@ -442,7 +457,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           className="tooltip-btn-bottom"
           data-title="Clear all messages (Ctrl+Shift+X)"
           style={{
-            background: "#fd0",
+            background: "linear-gradient(135deg, #fd0 0%, #fa0 100%)",
             color: "#000",
             border: "none",
             borderRadius: 6,

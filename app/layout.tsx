@@ -28,6 +28,8 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body suppressHydrationWarning>
+        <div className="ghost-wisp ghost-right">👻</div>
+        <div className="ghost-wisp ghost-left">👻</div>
         {children}
       </body>
     </html>
