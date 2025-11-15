@@ -454,8 +454,6 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             getMessages().forEach(m => deleteMessage(m.id));
             setMessages([]);
           }}
-          className="tooltip-btn-bottom"
-          data-title="Clear all messages (Ctrl+Shift+X)"
           style={{
             background: "linear-gradient(135deg, #fd0 0%, #fa0 100%)",
             color: "#000",
