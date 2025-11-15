@@ -28,6 +28,9 @@ No servers storing or reading your conversations. Everything exists only in memo
 ### Chat Interface
 ![GhostChat Interface](public/assets/chatboard.png)
 
+### Copy Invite Link
+![Copy Invite Link](public/assets/copylink.png)
+
 </div>
 
 ---
