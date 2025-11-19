@@ -9,10 +9,8 @@ export default function Home() {
   const [encodedInput, setEncodedInput] = useState("");
   const [decodeError, setDecodeError] = useState("");
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const pasted = e.clipboardData.getData('text').trim();
-    setEncodedInput(pasted);
-    const decoded = decodeInviteLink(pasted);
+  const handleDecode = () => {
+    const decoded = decodeInviteLink(encodedInput);
     if (decoded) {
       window.location.href = decoded;
     } else {
@@ -40,7 +38,6 @@ export default function Home() {
             type="text"
             value={encodedInput}
             onChange={(e) => setEncodedInput(e.target.value)}
-            onPaste={handlePaste}
             placeholder="Paste encoded invite code..."
             style={{
               width: "100%",
@@ -56,6 +53,24 @@ export default function Home() {
               textAlign: "center",
             }}
           />
+          <button
+            onClick={handleDecode}
+            disabled={!encodedInput.trim()}
+            style={{
+              width: "100%",
+              padding: 12,
+              marginTop: 8,
+              background: encodedInput.trim() ? "linear-gradient(135deg, #0f0 0%, #0d0 100%)" : "#333",
+              border: "none",
+              borderRadius: 8,
+              color: encodedInput.trim() ? "#000" : "#666",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: encodedInput.trim() ? "pointer" : "not-allowed",
+            }}
+          >
+            Decode & Connect
+          </button>
           {decodeError && (
             <div style={{ marginTop: 8, fontSize: 10, color: "#f00" }}>
               {decodeError}

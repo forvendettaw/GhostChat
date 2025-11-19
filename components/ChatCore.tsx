@@ -478,7 +478,26 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           position: "relative",
         }}
       >
-        <div style={{ position: "absolute", left: 16, fontSize: 12, opacity: 0.6 }}>
+        <button
+          onClick={() => window.location.href = '/'}
+          style={{
+            position: "absolute",
+            left: 16,
+            background: "transparent",
+            border: "none",
+            color: "#fff",
+            fontSize: 20,
+            cursor: "pointer",
+            padding: 8,
+            display: "flex",
+            alignItems: "center",
+            opacity: 0.6,
+          }}
+          title="Back to home"
+        >
+          ←
+        </button>
+        <div style={{ position: "absolute", left: 56, fontSize: 12, opacity: 0.6 }}>
           Your ID: {peerId.slice(0, 8)}...
         </div>
         <button
@@ -491,7 +510,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             color: "#000",
             border: "none",
             borderRadius: 6,
-            padding: "8px 24px",
+            padding: "8px 20px",
             cursor: "pointer",
             fontWeight: 700,
             display: "flex",
@@ -499,7 +518,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             gap: 6,
           }}
         >
-          <span style={{ fontSize: 18, display: 'inline-block', animation: 'pulse 2s ease-in-out infinite' }}>🚨</span>
+          <span style={{ fontSize: 16, display: 'inline-block', animation: 'pulse 2s ease-in-out infinite' }}>🚨</span>
           <span style={{ fontSize: 10 }}>CLEAR ALL</span>
         </button>
       </div>
