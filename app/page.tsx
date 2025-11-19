@@ -27,8 +27,8 @@ export default function Home() {
           maxWidth: 500,
           margin: "0 auto 32px",
           padding: 16,
-          background: "rgba(0, 170, 255, 0.1)",
-          border: "2px solid rgba(0, 170, 255, 0.3)",
+          background: "rgba(255, 255, 255, 0.05)",
+          border: "2px solid rgba(255, 221, 0, 0.3)",
           borderRadius: 12,
         }}>
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
@@ -45,7 +45,7 @@ export default function Home() {
               background: "#0a0a0a",
               border: decodeError ? "1px solid #f00" : "1px solid #333",
               borderRadius: 8,
-              color: "#0f0",
+              color: "#fd0",
               fontSize: 11,
               fontFamily: "monospace",
               outline: "none",
