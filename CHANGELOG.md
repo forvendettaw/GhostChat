@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.9.5] - 2025-01-15
+
+### Added
+- **Email Filter Bypass**: Encoded invite links to bypass Gmail/email link tracking
+- **Landing Page Decoder**: Auto-decode input field at top of landing page
+- **Encoded Link Sharing**: Default share format now uses base64-encoded format
+
+### Changed
+- **Button Text**: "Start Chatting" changed to "Generate Chat"
+- **Share Instructions**: Updated to mention "main page decoder"
+- **Link Format**: Invite links now encoded as `aHR0-cHM6-Ly9n...` instead of raw URLs
+
+### Technical
+- Created `lib/link-encoder.ts` with encodeInviteLink/decodeInviteLink functions
+- Added auto-decode on paste with 300ms delay
+- Encoded format bypasses mysig.io and other email link wrappers
+- Base64 encoding with reversed string and dash separators
+
+---
+
 ## [0.9.4] - 2025-01-15
 
 ### Added

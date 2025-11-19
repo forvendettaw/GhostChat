@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { generateQRCode } from "@/lib/qr-code";
+import { encodeInviteLink, formatEncodedForEmail } from "@/lib/link-encoder";
 
 interface InviteSectionProps {
   peerId: string;
@@ -59,8 +60,9 @@ export default function InviteSection({
               </div>
               <div
                 onClick={async () => {
+                  const encoded = encodeInviteLink(inviteLink);
                   try {
-                    await navigator.clipboard.writeText(inviteLink);
+                    await navigator.clipboard.writeText(encoded);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   } catch (err) {
@@ -77,12 +79,13 @@ export default function InviteSection({
                   border: "1px solid #333",
                   cursor: "pointer",
                   transition: "background 0.2s",
-                  color: copied ? "#000" : "#fff",
+                  color: copied ? "#000" : "#0f0",
                   fontWeight: copied ? 600 : 400,
                   textAlign: copied ? "center" : "left",
+                  fontFamily: copied ? "inherit" : "monospace",
                 }}
               >
-                {copied ? "✓ Copied!" : inviteLink}
+                {copied ? "✓ Copied!" : encodeInviteLink(inviteLink)}
               </div>
             </>
           ) : (
@@ -92,7 +95,7 @@ export default function InviteSection({
           )}
           {inviteLink && (
             <>
-              <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
                 <button
                   onClick={() => setShowQR(!showQR)}
                   style={{
@@ -146,7 +149,7 @@ export default function InviteSection({
             </>
           )}
           <div style={{ opacity: 0.6, fontSize: 10 }}>
-            Peer must paste it in their browser or scan QR code to start chat
+            Peer pastes code at main page decoder
           </div>
           <div
             style={{

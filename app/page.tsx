@@ -1,14 +1,75 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { decodeInviteLink } from "@/lib/link-encoder";
 
 export default function Home() {
   const router = useRouter();
+  const [encodedInput, setEncodedInput] = useState("");
+  const [decodeError, setDecodeError] = useState("");
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text').trim();
+    setEncodedInput(pasted);
+    const decoded = decodeInviteLink(pasted);
+    if (decoded) {
+      setTimeout(() => {
+        window.location.href = decoded;
+      }, 300);
+    } else {
+      setDecodeError("Invalid code format");
+      setTimeout(() => setDecodeError(""), 3000);
+    }
+  };
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div style={{ textAlign: "center", maxWidth: "90%" }}>
-        <img src="/assets/ghostNobg.png" alt="Ghost" style={{ width: "120px", height: "120px", marginBottom: 20 }} className="ghost-icon" />
+        <div style={{
+          width: "100%",
+          maxWidth: 500,
+          margin: "0 auto 32px",
+          padding: 16,
+          background: "rgba(0, 170, 255, 0.1)",
+          border: "2px solid rgba(0, 170, 255, 0.3)",
+          borderRadius: 12,
+        }}>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "#fff" }}>
+            Paste the code sent by your peer here to open chat
+          </div>
+          <input
+            type="text"
+            value={encodedInput}
+            onChange={(e) => setEncodedInput(e.target.value)}
+            onPaste={handlePaste}
+            placeholder="Paste encoded invite code..."
+            style={{
+              width: "100%",
+              padding: 12,
+              background: "#0a0a0a",
+              border: decodeError ? "1px solid #f00" : "1px solid #333",
+              borderRadius: 8,
+              color: "#0f0",
+              fontSize: 11,
+              fontFamily: "monospace",
+              outline: "none",
+              boxSizing: "border-box",
+              textAlign: "center",
+            }}
+          />
+          {decodeError && (
+            <div style={{ marginTop: 8, fontSize: 10, color: "#f00" }}>
+              {decodeError}
+            </div>
+          )}
+          {encodedInput && !decodeError && (
+            <div style={{ marginTop: 8, fontSize: 10, color: "#0f0" }}>
+              Decoding...
+            </div>
+          )}
+        </div>
+        <img src="/assets/ghostNobg.png" alt="Ghost" style={{ width: "100px", height: "100px", marginBottom: 16 }} className="ghost-icon" />
         <h1 style={{ fontSize: "clamp(32px, 8vw, 48px)", marginBottom: 12, fontWeight: 700 }}>GhostChat</h1>
         <p style={{ fontSize: "clamp(14px, 3vw, 18px)", opacity: 0.7, marginBottom: 16 }} className="vanish-text">Your messages vanish like ghosts</p>
         <div style={{ 
@@ -30,7 +91,7 @@ export default function Home() {
             onClick={() => router.push("/chat")}
             className="start-btn"
           >
-            Start Chatting
+            Generate Chat
           </button>
           <a
             href="https://github.com/Teycir/GhostChat#readme"
