@@ -473,8 +473,9 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           padding: 16,
           borderBottom: "1px solid #333",
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
+          gap: 8,
           position: "relative",
         }}
       >
@@ -483,21 +484,23 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           style={{
             position: "absolute",
             left: 16,
+            top: 16,
             background: "transparent",
             border: "none",
             color: "#fff",
-            fontSize: 20,
+            fontSize: 24,
             cursor: "pointer",
             padding: 8,
             display: "flex",
             alignItems: "center",
-            opacity: 0.6,
+            fontWeight: 900,
+            opacity: 0.8,
           }}
           title="Back to home"
         >
           ←
         </button>
-        <div style={{ position: "absolute", left: 56, fontSize: 12, opacity: 0.6 }}>
+        <div style={{ fontSize: 11, opacity: 0.6, textAlign: "center" }}>
           Your ID: {peerId.slice(0, 8)}...
         </div>
         <button
