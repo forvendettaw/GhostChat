@@ -7,29 +7,36 @@ interface TURNProvider {
 
 const TURN_PROVIDERS: TURNProvider[] = [
   {
-    urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443'],
+    urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'],
+    priority: 1
+  },
+  {
+    urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp'],
     username: 'openrelayproject',
     credential: 'openrelayproject',
-    priority: 1
+    priority: 2
   },
   {
     urls: 'turn:turn.bistri.com:80',
     username: 'homeo',
     credential: 'homeo',
-    priority: 2
+    priority: 3
+  },
+  {
+    urls: ['stun:stun.relay.metered.ca:80'],
+    priority: 4
   }
 ];
 
 export function getTURNServers(): RTCIceServer[] {
-  const servers: RTCIceServer[] = [
-    { urls: 'stun:stun.l.google.com:19302' }
-  ];
+  const servers: RTCIceServer[] = [];
 
-  const topProvider = TURN_PROVIDERS.sort((a, b) => a.priority - b.priority)[0];
-  servers.push({
-    urls: topProvider.urls,
-    username: topProvider.username,
-    credential: topProvider.credential
+  TURN_PROVIDERS.sort((a, b) => a.priority - b.priority).forEach(provider => {
+    servers.push({
+      urls: provider.urls,
+      username: provider.username,
+      credential: provider.credential
+    });
   });
 
   if (typeof window !== 'undefined') {

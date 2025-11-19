@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decoder Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        input, button { padding: 10px; margin: 10px 0; width: 100%; box-sizing: border-box; }
+        .result { background: #111; padding: 10px; margin: 10px 0; border: 1px solid #333; word-break: break-all; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h2>GhostChat Decoder Test</h2>
+    
+    <h3>Test 1: Encode URL</h3>
+    <input type="text" id="urlInput" value="https://ghost-chat.pages.dev/chat?peer=test123" placeholder="Enter URL">
+    <button onclick="testEncode()">Encode</button>
+    <div class="result" id="encodeResult"></div>
+    
+    <h3>Test 2: Decode Code</h3>
+    <input type="text" id="codeInput" placeholder="Paste encoded code">
+    <button onclick="testDecode()">Decode</button>
+    <div class="result" id="decodeResult"></div>
+    
+    <h3>Test 3: Round Trip</h3>
+    <button onclick="testRoundTrip()">Test Round Trip</button>
+    <div class="result" id="roundTripResult"></div>
+
+    <script>
+        function encodeInviteLink(url) {
+            const base64 = btoa(url);
+            const reversed = base64.split('').reverse().join('');
+            const chunks = reversed.match(/.{1,4}/g) || [];
+            return chunks.join('-');
+        }
+
+        function decodeInviteLink(encoded) {
+            try {
+                const cleaned = encoded.trim().replace(/-/g, '');
+                const base64 = cleaned.split('').reverse().join('');
+                return atob(base64);
+            } catch (e) {
+                console.error('Decode error:', e);
+                return null;
+            }
+        }
+
+        function testEncode() {
+            const url = document.getElementById('urlInput').value;
+            const encoded = encodeInviteLink(url);
+            document.getElementById('encodeResult').innerHTML = 
+                '<div class="success">Encoded: ' + encoded + '</div>';
+        }
+
+        function testDecode() {
+            const code = document.getElementById('codeInput').value;
+            const decoded = decodeInviteLink(code);
+            if (decoded) {
+                document.getElementById('decodeResult').innerHTML = 
+                    '<div class="success">Decoded: ' + decoded + '</div>';
+            } else {
+                document.getElementById('decodeResult').innerHTML = 
+                    '<div class="error">Failed to decode</div>';
+            }
+        }
+
+        function testRoundTrip() {
+            const testUrl = 'https://ghost-chat.pages.dev/chat?peer=abc123xyz';
+            const encoded = encodeInviteLink(testUrl);
+            const decoded = decodeInviteLink(encoded);
+            const match = testUrl === decoded;
+            
+            document.getElementById('roundTripResult').innerHTML = 
+                '<div>Original: ' + testUrl + '</div>' +
+                '<div>Encoded: ' + encoded + '</div>' +
+                '<div>Decoded: ' + decoded + '</div>' +
+                '<div class="' + (match ? 'success' : 'error') + '">Match: ' + (match ? 'SUCCESS' : 'FAILED') + '</div>';
+        }
+
+        // Auto-run round trip test on load
+        window.onload = function() {
+            testRoundTrip();
+        };
+    </script>
+</body>
+</html>

@@ -238,7 +238,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
               setConnecting(false);
               setError(getConnectionErrorMessage({ type: "peer-unavailable" }));
             }
-          }, 15000);
+          }, 30000);
         }
       }
 
