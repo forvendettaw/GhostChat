@@ -14,9 +14,7 @@ export default function Home() {
     setEncodedInput(pasted);
     const decoded = decodeInviteLink(pasted);
     if (decoded) {
-      setTimeout(() => {
-        window.location.href = decoded;
-      }, 300);
+      window.location.href = decoded;
     } else {
       setDecodeError("Invalid code format");
       setTimeout(() => setDecodeError(""), 3000);
@@ -63,11 +61,7 @@ export default function Home() {
               {decodeError}
             </div>
           )}
-          {encodedInput && !decodeError && (
-            <div style={{ marginTop: 8, fontSize: 10, color: "#0f0" }}>
-              Decoding...
-            </div>
-          )}
+
         </div>
         <img src="/assets/ghostNobg.png" alt="Ghost" style={{ width: "100px", height: "100px", marginBottom: 16 }} className="ghost-icon" />
         <h1 style={{ fontSize: "clamp(32px, 8vw, 48px)", marginBottom: 12, fontWeight: 700 }}>GhostChat</h1>

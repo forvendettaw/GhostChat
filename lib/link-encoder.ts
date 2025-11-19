@@ -1,21 +1,5 @@
-function base64Encode(str: string): string {
-  try {
-    return btoa(unescape(encodeURIComponent(str)));
-  } catch {
-    return btoa(str);
-  }
-}
-
-function base64Decode(str: string): string {
-  try {
-    return decodeURIComponent(escape(atob(str)));
-  } catch {
-    return atob(str);
-  }
-}
-
 export function encodeInviteLink(url: string): string {
-  const base64 = base64Encode(url);
+  const base64 = btoa(url);
   const reversed = base64.split('').reverse().join('');
   const chunks = reversed.match(/.{1,4}/g) || [];
   return chunks.join('-');
@@ -23,10 +7,11 @@ export function encodeInviteLink(url: string): string {
 
 export function decodeInviteLink(encoded: string): string | null {
   try {
-    const reversed = encoded.replace(/-/g, '');
-    const base64 = reversed.split('').reverse().join('');
-    return base64Decode(base64);
-  } catch {
+    const cleaned = encoded.trim().replace(/-/g, '');
+    const base64 = cleaned.split('').reverse().join('');
+    return atob(base64);
+  } catch (e) {
+    console.error('Decode error:', e);
     return null;
   }
 }
