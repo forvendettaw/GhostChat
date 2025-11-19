@@ -29,7 +29,8 @@ export default function InviteSection({
             setLinkCreated(true);
             if (inviteLink) {
               try {
-                await navigator.clipboard.writeText(inviteLink);
+                const encoded = encodeInviteLink(inviteLink);
+                await navigator.clipboard.writeText(encoded);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               } catch (err) {
