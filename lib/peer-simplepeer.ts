@@ -45,7 +45,10 @@ async function tryConnectWorker(
           remotePeerId = msg.src;
           peer = new SimplePeer({
             initiator: false,
-            config: { iceServers: getTURNServers() }
+            config: { 
+              iceServers: getTURNServers(),
+              iceTransportPolicy: 'all'
+            }
           });
           
           setupPeer(peer, storedOnMessage!, storedOnConnect!, storedOnDisconnect, msg.src);
@@ -171,7 +174,10 @@ export function connectSimplePeer(
   
   peer = new SimplePeer({
     initiator: true,
-    config: { iceServers: getTURNServers() }
+    config: { 
+      iceServers: getTURNServers(),
+      iceTransportPolicy: 'all'
+    }
   });
   
   setupPeer(peer, onMessage, onConnect, onDisconnect, targetPeerId);
