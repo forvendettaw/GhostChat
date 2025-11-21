@@ -70,7 +70,7 @@ export default function MessageList({
   if (messages.length === 0) {
     return (
       <div style={{ textAlign: "center", opacity: 0.5, marginTop: 40 }}>
-        No messages yet. Start chatting!
+        No messages yet. Generate chat!
       </div>
     );
   }

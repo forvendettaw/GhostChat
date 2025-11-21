@@ -141,7 +141,7 @@ export default function Home() {
               lineHeight: 1.6,
             }}
           >
-            1. Click "Start Chatting" → Copy your link
+            1. Click "Generate chat" → Copy your link
             <br />
             2. Peer pastes link in the decoder and clicks decode
             <br />

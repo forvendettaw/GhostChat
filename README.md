@@ -142,7 +142,7 @@ https://ghost-chat.pages.dev
 
 **2. Create a room:**
 
-- Click "Start Chatting"
+- Click "Generate chat"
 - Click "Create Room"
 - Copy the invite link
 
