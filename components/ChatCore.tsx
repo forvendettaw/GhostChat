@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getMessages, storeMessage, deleteMessage, markAsRead, setMaxMessages } from "@/lib/storage";
+import { getMessages, storeMessage, deleteMessage, maskMessage, markAsRead, setMaxMessages } from "@/lib/storage";
 import {
   initPeer,
   connectToPeer,
@@ -116,6 +116,11 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           const parsed = JSON.parse(data);
           if (parsed.type === "delete") {
             deleteMessage(parsed.id);
+            setMessages(getMessages().slice());
+            return;
+          }
+          if (parsed.type === "mask") {
+            maskMessage(parsed.id);
             setMessages(getMessages().slice());
             return;
           }
@@ -265,8 +270,8 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         let changed = false;
         msgs.forEach(msg => {
           if (msg.expiresAt && msg.expiresAt <= now) {
-            deleteMessage(msg.id);
-            if (connected) sendToAll(JSON.stringify({ type: "delete", id: msg.id }));
+            maskMessage(msg.id);
+            if (connected) sendToAll(JSON.stringify({ type: "mask", id: msg.id }));
             changed = true;
           }
         });

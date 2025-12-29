@@ -7,6 +7,7 @@ export interface Message {
   expiresAt?: number;
   createdAt?: number;
   sensitive?: boolean;
+  masked?: boolean;
   file?: {
     name: string;
     size: number;
@@ -33,8 +34,15 @@ export function storeMessage(msg: Message) {
   msg.createdAt = Date.now();
   messages.push(msg);
   if (messages.length > maxMessages) {
-    const removed = messages.shift();
-    if (removed) overwriteMemory(removed);
+    const oldest = messages[0];
+    if (oldest && !oldest.masked) {
+      oldest.masked = true;
+      oldest.text = '[Message encrypted due to limit]';
+      if (oldest.file) {
+        oldest.file.data = '';
+        oldest.file.name = '[Encrypted]';
+      }
+    }
   }
 }
 
@@ -48,6 +56,18 @@ export function deleteMessage(id: string) {
   messages = messages.filter(m => m.id !== id);
 }
 
+export function maskMessage(id: string) {
+  const msg = messages.find(m => m.id === id);
+  if (msg && !msg.masked) {
+    msg.masked = true;
+    msg.text = '[Message expired]';
+    if (msg.file) {
+      msg.file.data = '';
+      msg.file.name = '[Expired]';
+    }
+  }
+}
+
 export function markAsRead(id: string) {
   const msg = messages.find(m => m.id === id);
   if (msg) msg.read = true;
@@ -55,9 +75,20 @@ export function markAsRead(id: string) {
 
 export function setMaxMessages(max: number) {
   maxMessages = max;
-  while (messages.length > maxMessages) {
-    const removed = messages.shift();
-    if (removed) overwriteMemory(removed);
+  let unmaskedCount = messages.filter(m => !m.masked).length;
+  let index = 0;
+  while (unmaskedCount > maxMessages && index < messages.length) {
+    const msg = messages[index];
+    if (msg && !msg.masked) {
+      msg.masked = true;
+      msg.text = '[Message encrypted due to limit]';
+      if (msg.file) {
+        msg.file.data = '';
+        msg.file.name = '[Encrypted]';
+      }
+      unmaskedCount--;
+    }
+    index++;
   }
 }
 

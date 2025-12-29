@@ -12,6 +12,7 @@ interface Message {
   read?: boolean;
   expiresAt?: number;
   sensitive?: boolean;
+  masked?: boolean;
   file?: {
     name: string;
     size: number;
@@ -107,6 +108,7 @@ export default function MessageList({
           >
             <div
               onClick={() => {
+                if (msg.masked) return;
                 if (msg.sensitive && !revealedSensitive.has(msg.id)) {
                   setRevealedSensitive(new Set(revealedSensitive).add(msg.id));
                   setTimeout(() => {
@@ -120,24 +122,28 @@ export default function MessageList({
                   copyWithAutoClean(msg.text);
                 }
               }}
-              className={msg.text ? "tooltip-btn" : ""}
+              className={msg.text && !msg.masked ? "tooltip-btn" : ""}
               data-title={
-                msg.sensitive && !revealedSensitive.has(msg.id)
-                  ? "Click to reveal"
-                  : msg.text
-                    ? "Click to copy"
-                    : undefined
+                msg.masked
+                  ? "Message encrypted"
+                  : msg.sensitive && !revealedSensitive.has(msg.id)
+                    ? "Click to reveal"
+                    : msg.text
+                      ? "Click to copy"
+                      : undefined
               }
               style={{
                 padding: "8px 12px",
                 background: msg.isSelf ? "#fff" : "#333",
                 color: msg.isSelf ? "#000" : "#fff",
                 borderRadius: 8,
-                cursor: msg.text ? "pointer" : "default",
+                cursor: msg.text && !msg.masked ? "pointer" : "default",
                 filter:
                   msg.sensitive && !revealedSensitive.has(msg.id)
                     ? "blur(8px)"
                     : "none",
+                opacity: msg.masked ? 0.4 : 1,
+                fontStyle: msg.masked ? "italic" : "normal",
                 transition: "filter 0.2s",
                 textAlign: "left",
               }}
