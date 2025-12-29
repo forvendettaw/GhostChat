@@ -22,12 +22,6 @@ No servers storing or reading your conversations. Everything exists only in memo
 
 ---
 
-## ⚠️ Disclaimer
-
-**This project is shared for educational purposes only.** Users are responsible for complying with all applicable laws and regulations. Do not use this tool for illegal activities. The developers assume no liability for misuse.
-
----
-
 ## 📸 Screenshots
 
 <div align="center">
@@ -491,12 +485,6 @@ docker run -p 3000:3000 ghostchat
 MIT License - see [LICENSE](LICENSE) file for details.
 
 **TL;DR:** Free to use, modify, and distribute. No warranty provided.
-
----
-
-## ⚠️ Disclaimer
-
-This project is shared for **educational purposes only**. Users are responsible for complying with all applicable laws and regulations. Do not use this tool for illegal activities. The developers assume no liability for misuse.
 
 ---
 
