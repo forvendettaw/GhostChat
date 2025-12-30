@@ -22,6 +22,24 @@ No servers storing or reading your conversations. Everything exists only in memo
 
 ---
 
+## 📑 Table of Contents
+
+- [Screenshots](#-screenshots)
+- [Why GhostChat?](#-why-ghostchat)
+- [Comparison](#-comparison)
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [Architecture](#-architecture)
+- [Security](#-security)
+- [Development](#-development)
+- [Deployment](#-deployment)
+- [Professional Services](#-professional-services)
+- [License](#-license)
+- [Acknowledgments](#-acknowledgments)
+- [Support](#-support)
+
+---
+
 ## 📸 Screenshots
 
 <div align="center">
@@ -485,6 +503,30 @@ docker run -p 3000:3000 ghostchat
 MIT License - see [LICENSE](LICENSE) file for details.
 
 **TL;DR:** Free to use, modify, and distribute. No warranty provided.
+
+---
+
+## 💼 Professional Services
+
+Need custom P2P solutions or privacy-focused applications? I build production-ready secure communication tools.
+
+### Featured Projects
+
+- **[TimeSeal](https://timeseal.online)** ([GitHub](https://github.com/Teycir/Timeseal)) - Cryptographic time-locked vault and dead man's switch with zero-trust encryption
+- **[GhostChat](https://ghost-chat.pages.dev)** - True P2P encrypted chat with WebRTC, no server storage, self-destruct timers
+- **[BurpAPISecuritySuite](https://github.com/Teycir/BurpAPISecuritySuite)** - Professional API security testing toolkit for Burp Suite
+- **[BurpCopyIssues](https://github.com/Teycir/BurpCopyIssues)** - Burp Suite extension for browsing, copying, and exporting scan findings
+- **[BurpWpsScan](https://github.com/Teycir/BurpWpsScan)** - WordPress security scanner for Burp Suite with WPScan API integration
+
+### Services Offered
+
+- 🔒 **Privacy-First Development** - P2P applications, encrypted communication, zero-knowledge systems
+- 🚀 **Web Application Development** - Full-stack development with Next.js, React, TypeScript
+- 🔧 **WebRTC Solutions** - Real-time communication, video/audio streaming, data channels
+- 🛡️ **Security Tool Development** - Burp extensions, penetration testing tools, automation frameworks
+- 🤖 **AI Integration** - LLM-powered applications, intelligent automation, custom AI solutions
+
+**Get in Touch**: [teycirbensoltane.tn](https://teycirbensoltane.tn) | Available for freelance projects and consulting
 
 ---
 
