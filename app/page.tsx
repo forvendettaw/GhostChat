@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { decodeInviteLink } from "@/lib/link-encoder";
+import { AnimatedTagline } from "@/components/AnimatedTagline";
+import { CyclingFeatures } from "@/components/CyclingFeatures";
 
 export default function Home() {
   const router = useRouter();
@@ -112,17 +114,8 @@ export default function Home() {
         >
           GhostChat
         </h1>
-        <p
-          style={{
-            fontSize: "clamp(16px, 4vw, 22px)",
-            opacity: 0.9,
-            marginBottom: 24,
-            fontWeight: 500,
-          }}
-          className="vanish-text"
-        >
-          Your messages vanish like ghosts
-        </p>
+        <AnimatedTagline text="Your messages vanish like ghosts" />
+        <CyclingFeatures />
         <a
           href="https://www.youtube.com/watch?v=4-Iw9r4g8D0"
           target="_blank"
