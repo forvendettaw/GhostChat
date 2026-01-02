@@ -13,6 +13,8 @@ export function AnimatedTagline({ text }: { text: string }) {
         marginBottom: 24,
         fontWeight: 500,
         cursor: 'default',
+        textAlign: 'center',
+        width: '100%',
       }}
       className="vanish-text"
       initial="hidden"
@@ -21,7 +23,7 @@ export function AnimatedTagline({ text }: { text: string }) {
       {chars.map((char, i) => (
         <motion.span
           key={i}
-          style={{ display: 'inline-block' }}
+          style={{ display: 'inline-block', textAlign: 'center' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{
