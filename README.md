@@ -2,479 +2,517 @@
 
 # 👻 GhostChat
 
-### Your messages vanish like ghosts
+### 消息如幽灵般消逝
 
-**True peer-to-peer chat where messages travel directly between users.**  
-No servers storing or reading your conversations. Everything exists only in memory and disappears when you close the tab.
+**真正的点对点聊天，消息直接在用户之间传输。**
+不存储、不读取您的对话内容。所有内容仅存在于内存中，关闭标签页后即消失。
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org)
 [![WebRTC](https://img.shields.io/badge/WebRTC-P2P-orange)](https://webrtc.org)
-[![simple-peer](https://img.shields.io/badge/simple--peer-9-green)](https://github.com/feross/simple-peer)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange)](https://workers.cloudflare.com)
 
-[Live Demo](https://ghost-chat.pages.dev) • [Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
+[在线演示](https://ghost-chat-bxc.pages.dev) • [贡献指南](CONTRIBUTING.md) • [更新日志](CHANGELOG.md)
 
-**🎥 [Watch Demo Video](https://sendspark.com/share/jq2rruwx9q3s97gbswef1sabm09ofzye)**
+**🎥 [观看演示视频](https://www.youtube.com/watch?v=4-Iw9r4g8D0)**
 
 </div>
 
 ---
 
-## 📑 Table of Contents
+## 📑 目录
 
-- [Screenshots](#-screenshots)
-- [Why GhostChat?](#-why-ghostchat)
-- [Comparison](#-comparison)
-- [Features](#-features)
-- [Quick Start](#-quick-start)
-- [Architecture](#-architecture)
-- [Security](#-security)
-- [Development](#-development)
-- [Deployment](#-deployment)
-- [Professional Services](#-professional-services)
-- [License](#-license)
-- [Acknowledgments](#-acknowledgments)
-- [Support](#-support)
+- [截图](#-截图)
+- [为什么选择 GhostChat？](#-为什么选择-ghostchat)
+- [功能对比](#-功能对比)
+- [功能特性](#-功能特性)
+- [快速开始](#-快速开始)
+- [架构设计](#-架构设计)
+- [安全性](#-安全性)
+- [开发指南](#-开发指南)
+- [部署说明](#-部署说明)
+- [许可证](#-许可证)
+- [致谢](#-致谢)
+- [支持](#-支持)
 
 ---
 
-## 📸 Screenshots
+## 📸 截图
 
 <div align="center">
 
-### Landing Page
+### 首页
 
-![GhostChat Landing Page](public/assets/landingpage.png)
+![GhostChat 首页](public/assets/landingpage.png)
 
-### Copy Invite Link
+### 聊天界面（微信风格）
 
-![Copy Invite Link](public/assets/copylink.png)
+![GhostChat 聊天界面](public/assets/chatboard.png)
 
-### Chat Interface
+### 连接指纹（中间人攻击防护）
 
-![GhostChat Interface](public/assets/chatboard.png)
-
-### Connection Fingerprint (MITM Protection)
-
-![Connection Fingerprint](public/assets/fingerprint.png)
+![连接指纹](public/assets/fingerprint.png)
 
 </div>
 
 ---
 
-## 🎯 Why GhostChat?
+## 🎯 为什么选择 GhostChat？
 
-Most "secure" messaging apps still store your messages on servers. Even Signal and WhatsApp keep metadata. **GhostChat is different:**
+大多数"安全"聊天应用仍然在服务器上存储您的消息。即使是 Signal 和 WhatsApp 也会保留元数据。**GhostChat 完全不同：**
 
-- ✅ **True P2P** - Messages travel directly between users via WebRTC
-- ✅ **Zero server storage** - No databases, no logs, no message history
-- ✅ **Memory-only** - Everything stored in RAM, wiped on tab close
-- ✅ **No accounts** - No phone numbers, emails, or persistent identity
-- ✅ **Self-destructing** - Messages auto-delete after 5s, 30s, 1m, or 5m
-- ✅ **Open source** - Fully auditable code (MIT license)
+- ✅ **真正的 P2P** - 消息通过 WebRTC 直接在用户之间传输
+- ✅ **零服务器存储** - 无数据库、无日志、无消息历史
+- ✅ **仅内存存储** - 所有内容仅存储在 RAM 中，关闭标签页即清空
+- ✅ **无需账户** - 无需手机号、邮箱或持久身份
+- ✅ **自动销毁** - 消息可在 5 秒、30 秒、1 分钟或 5 分钟后自动删除
+- ✅ **开源** - 完全可审计的代码（MIT 许可证）
+- ✅ **微信风格** - 移动端优化的简洁界面，绿色气泡，直观易用
 
-**Perfect for:** Journalists, whistleblowers, activists, lawyers, executives, or anyone who values true privacy.
-
----
-
-## 📊 Comparison
-
-| Feature                      | GhostChat | Signal      | WhatsApp    | Telegram    |
-| ---------------------------- | --------- | ----------- | ----------- | ----------- |
-| **True P2P**                 | ✅ Yes    | ❌ No       | ❌ No       | ❌ No       |
-| **No server storage**        | ✅ Yes    | ❌ Metadata | ❌ Metadata | ❌ Messages |
-| **Does not require account** | ✅ Yes    | ❌ Phone    | ❌ Phone    | ❌ Phone    |
-| **No logs**                  | ✅ Yes    | ❌ No       | ❌ No       | ❌ No       |
-| **Self-destruct**            | ✅ Yes    | ✅ Yes      | ❌ No       | ✅ Yes      |
-| **Open source**              | ✅ Yes    | ✅ Yes      | ❌ No       | ❌ Partial  |
-| **Cost**                     | 💰 Free   | 💰 Free     | 💰 Free     | 💰 Free     |
+**完美适用于：** 记者、吹哨人、活动家、律师、高管，以及任何重视真正隐私的人士。
 
 ---
 
-## ✨ Features
+## 📊 功能对比
 
-### 🔒 Privacy & Security
-
-- **Direct P2P connections** - Messages never touch servers
-- **E2E encryption** - WebRTC native DTLS/SRTP
-- **Memory-only storage** - Zero disk traces, no forensics possible
-- **Ephemeral identity** - Random peer ID per session
-- **Auto-clear on close** - All data wiped when tab closes
-- **Connection fingerprint** - 4-emoji hash to verify no MITM
-- **Sensitive content blur** - Auto-detect and blur passwords, SSN, credit cards
-- **Metadata stripping** - Remove EXIF data from images
-- **Anti-forensics** - Memory overwrite on message delete
-
-### 💬 Messaging
-
-- **Self-destructing messages** - Timer: 5s, 30s, 1m, 5m, or never
-- **Message deletion** - Delete for both sides with P2P sync
-- **Read receipts** - Single/double checkmark delivery status
-- **Typing indicators** - See when peer is typing
-- **Markdown support** - 16 formatting buttons (bold, italic, code, etc.)
-- **Quick emojis** - 15 one-click emoji buttons
-- **Message search** - Real-time filtering with highlighting
-- **Copy protection** - Clipboard auto-clears after 10 seconds
-
-### 📁 File Sharing
-
-- **P2P file transfer** - Send files up to 10MB directly
-- **Chunked transfer** - Reliable transmission via 64KB chunks
-- **Upload progress** - Real-time progress bar
-- **Image preview** - Inline display for images
-- **Metadata stripping** - EXIF removal from images
-
-### 🚨 Emergency Features
-
-- **Panic button** - Clear all messages instantly (Ctrl+Shift+X)
-- **Message limit** - Auto-cleanup (10, 25, 50, or 100 messages)
-- **Session timeout** - Auto-disconnect after inactivity (5m-1h)
-- **Screen blur** - Auto-blur on tab switch or idle
-
-### 🌐 Infrastructure
-
-- **$0 operating costs** - Cloudflare Workers signaling (200k requests/day)
-- **Automatic fallback** - Worker 1 → Worker 2 → PeerJS backup
-- **PWA support** - Installable as desktop/mobile app
-- **No tracking** - Zero analytics, telemetry, or user data collection
+| 功能特性              | GhostChat | Signal      | WhatsApp    | Telegram    |
+| --------------------- | --------- | ----------- | ----------- | ----------- |
+| **真正的 P2P**        | ✅ 是     | ❌ 否       | ❌ 否       | ❌ 否       |
+| **无服务器存储**      | ✅ 是     | ❌ 元数据   | ❌ 元数据   | ❌ 消息     |
+| **无需账户**          | ✅ 是     | ❌ 手机号   | ❌ 手机号   | ❌ 手机号   |
+| **无日志**            | ✅ 是     | ❌ 否       | ❌ 否       | ❌ 否       |
+| **自动销毁**          | ✅ 是     | ✅ 是       | ❌ 否       | ✅ 是       |
+| **开源**              | ✅ 是     | ✅ 是       | ❌ 否       | ❌ 部分开源 |
+| **费用**              | 💰 免费   | 💰 免费     | 💰 免费     | 💰 免费     |
+| **移动端优化**        | ✅ 是     | ✅ 是       | ✅ 是       | ✅ 是       |
+| **微信风格界面**      | ✅ 是     | ❌ 否       | ❌ 否       | ❌ 否       |
 
 ---
 
-## 🚀 Quick Start
+## ✨ 功能特性
 
-### For Users
+### 🔒 隐私与安全
 
-**1. Visit the app:**
+- **直接 P2P 连接** - 消息完全不经过服务器
+- **端到端加密** - 使用 WebRTC 原生的 DTLS/SRTP
+- **仅内存存储** - 零磁盘痕迹，无法取证
+- **临时身份** - 每次会话随机生成 peer ID
+- **关闭自动清除** - 关闭标签页时清除所有数据
+- **连接指纹** - 4 个表情符号的哈希值，验证无中间人攻击
+- **敏感内容模糊** - 自动检测并模糊密码、身份证号、信用卡
+- **元数据剥离** - 移除图片的 EXIF 数据
+- **反取证** - 删除消息时覆盖内存
+
+### 💬 消息功能
+
+- **自动销毁消息** - 定时器：5秒、30秒、1分钟、5分钟或永不
+- **消息删除** - P2P 同步双向删除
+- **已读回执** - 单/双勾选发送状态
+- **输入指示器** - 显示对方正在输入
+- **文件传输** - 直接发送最大 10MB 文件
+- **分块传输** - 通过 64KB 分块可靠传输
+- **上传进度** - 实时进度条
+- **图片预览** - 图片内联显示
+- **剪贴板保护** - 10 秒后自动清空剪贴板
+
+### 📱 移动端优化
+
+- **微信风格界面** - 绿色气泡（自己）+ 白色气泡（对方）
+- **简洁输入栏** - 左侧上传按钮 + 中间输入框 + 右侧发送按钮
+- **大触摸目标** - 所有按钮 ≥44px，符合 iOS/Android 规范
+- **响应式布局** - 完美适配手机、平板、桌面
+- **唤醒锁** - 防止移动设备在聊天时休眠
+- **HTTPS 强制** - 移动端自动使用安全连接
+
+### 🚨 紧急功能
+
+- **紧急按钮** - 立即清空所有消息（Ctrl+Shift+X）
+- **消息限制** - 自动清理（10、25、50 或 100 条消息）
+- **会话超时** - 不活动后自动断开（5分钟-1小时）
+- **屏幕模糊** - 切换标签页或空闲时自动模糊
+
+### 🌐 基础设施
+
+- **零运营成本** - Cloudflare Workers 信令（每天 20 万次请求）
+- **自动故障转移** - Worker 1 → Worker 2 → PeerJS 备用
+- **PWA 支持** - 可安装为桌面/移动应用
+- **无追踪** - 零分析、零遥测、零用户数据收集
+
+---
+
+## 🚀 快速开始
+
+### 普通用户
+
+**1. 访问应用：**
 
 ```
-https://ghost-chat.pages.dev
+https://ghost-chat-bxc.pages.dev
 ```
 
-**2. Create a room:**
+**2. 创建聊天室：**
 
-- Click "Generate chat"
-- Click "Create Room"
-- Copy the invite link
+- 点击"开始"按钮
+- 复制邀请链接
+- 分享给对方
 
-**3. Share with peer:**
+**3. 对方加入：**
 
-- Send invite link via text, email, or any channel
-- Peer clicks link and connects automatically
+- 对方点击邀请链接自动连接
+- 或在首页粘贴邀请码并点击"开始"
 
-**4. Chat privately:**
+**4. 私密聊天：**
 
-- Messages travel directly between you (P2P)
-- Close tab when done - everything vanishes
+- 消息直接在你们之间传输（P2P）
+- 聊天完成后关闭标签页 - 一切消失
 
-### For Developers
+### 开发者
 
-**Clone and run locally:**
+**克隆并本地运行：**
 
 ```bash
-# Clone repository
+# 克隆仓库
 git clone https://github.com/teycir/ghostchat.git
 cd ghostchat
 
-# Install dependencies
+# 安装依赖
 npm install
 
-# Run development server
+# 运行开发服务器
 npm run dev
 
-# Open http://localhost:3000
+# 打开 http://localhost:3000
 ```
 
-**Test P2P locally:**
+**本地测试 P2P：**
 
 ```bash
-# Terminal 1
+# 终端 1
 npm run dev
 
-# Browser Tab 1: localhost:3000/chat
-# Click "Create Room" → Copy invite link
+# 浏览器标签页 1: localhost:3000/chat
+# 点击"创建聊天室" → 复制邀请链接
 
-# Browser Tab 2: Paste invite link
-# Messages sync via WebRTC P2P
+# 浏览器标签页 2: 粘贴邀请链接
+# 消息通过 WebRTC P2P 同步
 ```
 
-**Build for production:**
+**构建生产版本：**
 
 ```bash
 npm run build
 npm start
 
-# Or deploy static export
+# 或部署静态导出
 npm run build
-# Upload /out directory to any static host
+# 上传 /out 目录到任何静态主机
 ```
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ 架构设计
 
-### How P2P Works
+### P2P 工作原理
 
 ```
-User A                    Signaling Server              User B
+用户 A                    信令服务器              用户 B
   |                              |                         |
-  |------ Create Room ---------->|                         |
+  |------ 创建聊天室 ----------->|                         |
   |<----- Peer ID: abc123 -------|                         |
   |                              |                         |
-  |                              |<----- Join: abc123 -----|
-  |<---- WebRTC Offer -----------|------ Forward Offer --->|
-  |<---- ICE Candidates ---------|------ Forward ICE ----->|
+  |                              |<----- 加入: abc123 -----|
+  |<---- WebRTC Offer -----------|------ 转发 Offer ------->|
+  |<---- ICE Candidates ---------|------ 转发 ICE -------->|
   |                              |                         |
-  |<========== Direct P2P Connection ===================>|
+  |<========== 直接 P2P 连接 =============================>|
   |                              |                         |
-  |-- "Hello!" ------------------------------------------>|
-  |<----------------------------------------- "Hi!" ------|
+  |-- "你好！" ------------------------------------------>|
+  |<------------------------------------------- "嗨！" ---|
   |                              |                         |
-  (Signaling server no longer involved)
+  (信令服务器不再参与)
 ```
 
-**Key Points:**
+**关键点：**
 
-1. Signaling server only helps establish connection (WebRTC SDP exchange)
-2. Once connected, messages flow directly peer-to-peer
-3. Server never sees message content
-4. Connection uses WebRTC DataChannels (DTLS encrypted)
+1. 信令服务器仅帮助建立连接（WebRTC SDP 交换）
+2. 连接建立后，消息直接点对点传输
+3. 服务器永远看不到消息内容
+4. 连接使用 WebRTC DataChannels（DTLS 加密）
 
-### Tech Stack
+### 技术栈
 
-- **Frontend:** Next.js 15, React, TypeScript
-- **P2P Protocol:** simple-peer (primary), PeerJS (fallback)
-- **Signaling:** Cloudflare Workers (self-hosted)
-- **Styling:** CSS-in-JS (no external CSS frameworks)
-- **Storage:** Memory-only (no localStorage/IndexedDB)
-- **Deployment:** Static export (Cloudflare Pages, Vercel, Netlify)
+- **前端：** Next.js 15, React, TypeScript
+- **P2P 协议：** simple-peer（主要）、PeerJS（备用）
+- **信令：** Cloudflare Workers（自托管）
+- **样式：** CSS-in-JS（无外部 CSS 框架）
+- **存储：** 仅内存（无 localStorage/IndexedDB）
+- **部署：** 静态导出（Cloudflare Pages, Vercel, Netlify）
 
-### Project Structure
+### 项目结构
 
 ```
 ghostchat/
 ├── app/                    # Next.js App Router
-│   ├── page.tsx           # Landing page
-│   ├── chat/page.tsx      # Chat page
-│   └── globals.css        # Global styles
-├── components/            # React components
-│   ├── ChatCore.tsx       # Main chat logic
-│   ├── MessageList.tsx    # Message rendering
+│   ├── page.tsx           # 首页（极简设计）
+│   ├── chat/page.tsx      # 聊天页面
+│   └── globals.css        # 全局样式
+├── components/            # React 组件
+│   ├── ChatCore.tsx       # 主聊天逻辑
+│   ├── MessageList.tsx    # 消息渲染（微信风格）
+│   ├── MessageInput.tsx   # 输入组件（简洁设计）
 │   └── ...
-├── lib/                   # Core libraries
-│   ├── peer-manager.ts    # P2P connection manager
-│   ├── storage.ts         # Memory-only storage
-│   ├── file-transfer.ts   # Chunked file transfer
+├── lib/                   # 核心库
+│   ├── peer-manager.ts    # P2P 连接管理器
+│   ├── storage.ts         # 仅内存存储
+│   ├── file-transfer.ts   # 分块文件传输
 │   └── ...
-├── public/                # Static assets
+├── cloudflare-worker/     # Cloudflare Workers 信令
+│   ├── index.js          # Durable Object 实现
+│   └── wrangler.toml     # Workers 配置
+├── public/                # 静态资源
 │   ├── manifest.json      # PWA manifest
-│   └── sw.js             # Service worker
-└── tests/                 # Test suite
+│   └── assets/           # 图片和图标
+└── tests/                 # 测试套件
 ```
 
 ---
 
-## 🔐 Security
+## 🔐 安全性
 
-### Threat Model
+### 威胁模型
 
-**What GhostChat protects against:**
+**GhostChat 防护对象：**
 
-- ✅ Server-side data breaches (no server storage)
-- ✅ Message interception (E2E encrypted)
-- ✅ Forensic analysis (memory-only, no disk traces)
-- ✅ Persistent surveillance (ephemeral sessions)
-- ✅ Metadata collection (no accounts, minimal logs)
+- ✅ 服务器端数据泄露（无服务器存储）
+- ✅ 消息拦截（端到端加密）
+- ✅ 取证分析（仅内存，无磁盘痕迹）
+- ✅ 持续监控（临时会话）
+- ✅ 元数据收集（无账户，最少日志）
 
-**What GhostChat does NOT protect against:**
+**GhostChat 不防护对象：**
 
-- ❌ Compromised devices (keyloggers, screen capture)
-- ❌ Man-in-the-middle attacks (verify fingerprint!)
-- ❌ IP address exposure (peers see each other's IPs - use VPN)
-- ❌ Browser vulnerabilities (keep browser updated)
+- ❌ 被入侵的设备（键盘记录器、屏幕截取）
+- ❌ 中间人攻击（请验证指纹！）
+- ❌ IP 地址暴露（双方互见 IP - 使用 VPN）
+- ❌ 浏览器漏洞（保持浏览器更新）
 
-### Man-in-the-Middle (MITM) Attack Vectors
+### 中间人（MITM）攻击向量
 
-GhostChat is vulnerable to MITM attacks during the initial connection phase. Here's how:
+GhostChat 在初始连接阶段容易受到 MITM 攻击。具体方式：
 
-**1. Signaling Server Compromise**
+**1. 信令服务器入侵**
 
-- The Cloudflare Worker facilitates WebRTC handshake (SDP exchange)
-- A compromised signaling server could intercept and modify:
-  - Session Description Protocol (SDP) offers/answers
-  - ICE candidates (connection endpoints)
-  - Encryption keys during negotiation
-- Result: Attacker establishes two separate connections (A↔Attacker↔B)
+- Cloudflare Worker 协助 WebRTC 握手（SDP 交换）
+- 被入侵的信令服务器可能拦截并修改：
+  - 会话描述协议（SDP）offer/answer
+  - ICE 候选（连接端点）
+  - 协商期间的加密密钥
+- 结果：攻击者建立两个独立连接（A↔攻击者↔B）
 
-**2. Invite Link Interception**
+**2. 邀请链接拦截**
 
-- Invite links contain the peer ID: `https://ghost-chat.pages.dev/chat?peer=abc123`
-- If shared via insecure channel (SMS, unencrypted email, public chat):
-  - Attacker intercepts link and connects first
-  - Original recipient connects to attacker instead of intended peer
-- Result: Both parties unknowingly chat with the attacker
+- 邀请链接包含 peer ID：`https://ghost-chat.pages.dev/chat?peer=abc123`
+- 如果通过不安全渠道共享（短信、非加密邮件、公开聊天）：
+  - 攻击者拦截链接并首先连接
+  - 原始接收者连接到攻击者而非预期对方
+- 结果：双方都不知情地与攻击者聊天
 
-**3. Network-Level Attack**
+**3. 网络级攻击**
 
-- Attacker on same WiFi/network can:
-  - Perform DNS spoofing to redirect traffic
-  - Intercept WebRTC negotiation packets
-  - Inject malicious ICE candidates
-- Result: Traffic routed through attacker's machine
+- 同一 WiFi/网络上的攻击者可以：
+  - 执行 DNS 欺骗重定向流量
+  - 拦截 WebRTC 协商数据包
+  - 注入恶意 ICE 候选
+- 结果：流量通过攻击者机器路由
 
-### MITM Protection: Connection Fingerprint
+### MITM 防护：连接指纹
 
-GhostChat includes a **connection fingerprint** system to detect MITM attacks:
-
-```
-🔴🟢🔵🟡  ← 4-emoji hash
-123456     ← 6-digit verification code
-```
-
-**Simple Explanation:**
-
-Think of it like a secret handshake that only works if you're talking directly:
-
-- When you connect, both you and your peer combine your unique IDs
-- This creates a fingerprint - 4 emojis like a "connection DNA"
-- Both see the SAME emojis if directly connected
-- If someone is in the middle, they have a different ID, so emojis won't match
-
-**Real-world analogy:** You and a friend each write your names on paper, mix them together, and create a unique pattern. If you both see the same pattern, you're talking directly. If an attacker intercepts, they use their own name, creating a different pattern - you'd notice!
-
-**How it works technically:**
-
-1. Both peers generate a deterministic hash from their peer IDs
-2. Hash is displayed as 4 emojis + 6-digit code
-3. **If connection is direct:** Both see IDENTICAL fingerprint
-4. **If MITM present:** Each sees DIFFERENT fingerprint (because attacker has different peer ID)
-
-**Example:**
+GhostChat 包含**连接指纹**系统来检测 MITM 攻击：
 
 ```
-Direct Connection:
-  Alice sees: 🔴🟢🔵🟡 (hash of Alice+Bob)
-  Bob sees:   🔴🟢🔵🟡 (hash of Alice+Bob) ✅ MATCH
-
-MITM Attack:
-  Alice sees: 🔴🟢🔵🟡 (hash of Alice+Attacker)
-  Bob sees:   🟣🟠⚫🔶 (hash of Bob+Attacker) ❌ MISMATCH
+🔴🟢🔵🟡  ← 4 个表情符号哈希
+123456     ← 6 位验证码
 ```
 
-### Security Best Practices
+**简单解释：**
 
-**CRITICAL: Always verify fingerprint out-of-band**
+将其想象成一个只有直接对话时才有效的秘密握手：
 
-1. **Verify connection fingerprint** - Compare 4-emoji hash via separate channel:
-   - Phone call (read emojis aloud)
-   - Video call (show screen)
-   - In-person verification
-   - Signal/WhatsApp message (different channel than invite link)
-   - **DO NOT** verify via the same channel you shared the invite link
+- 连接时，双方将唯一的 ID 组合
+- 创建指纹 - 4 个表情符号，像"连接 DNA"
+- 如果直接连接，双方看到**相同**的表情符号
+- 如果有人在中间，他们有不同的 ID，表情符号不匹配
 
-2. **Share invite links securely**
-   - Use end-to-end encrypted messaging (Signal, WhatsApp)
-   - Share in person (QR code scan)
-   - Avoid SMS, email, public forums
+**现实类比：** 你和朋友分别在纸上写下名字，混合在一起，创建独特图案。如果看到相同图案，说明在直接对话。如果攻击者拦截，他们使用自己的名字，创建不同图案 - 你会注意到！
 
-3. **Use VPN** - Hide your IP address from peer and network observers
+**技术原理：**
 
-4. **Secure device** - Keep OS and browser updated
+1. 双方从 peer ID 生成确定性哈希
+2. 哈希显示为 4 个表情符号 + 6 位代码
+3. **如果直接连接：** 双方看到**相同**指纹
+4. **如果 MITM 存在：** 双方看到**不同**指纹（因为攻击者有不同 peer ID）
 
-5. **Private browsing** - Use incognito/private mode
+**示例：**
 
-6. **Trusted network** - Avoid public WiFi without VPN
+```
+直接连接：
+  Alice 看到： 🔴🟢🔵🟡 (Alice+Bob 的哈希)
+  Bob 看到：   🔴🟢🔵🟡 (Alice+Bob 的哈希) ✅ 匹配
 
-7. **Fresh session** - Create new room for each conversation (don't reuse peer IDs)
+MITM 攻击：
+  Alice 看到： 🔴🟢🔵🟡 (Alice+攻击者 的哈希)
+  Bob 看到：   🟣🟠⚫🔶 (Bob+攻击者 的哈希) ❌ 不匹配
+```
 
-### Security Audits
+### 安全最佳实践
 
-- [ ] Independent security audit (planned)
-- [ ] Penetration testing (planned)
-- [ ] Bug bounty program (planned)
+**关键：始终通过带外验证指纹**
 
-**Found a vulnerability?** Please report responsibly to [teycir@pxdmail.net](mailto:teycir@pxdmail.net)
+1. **验证连接指纹** - 通过独立渠道比较 4 个表情符号哈希：
+   - 电话（朗读表情符号）
+   - 视频通话（展示屏幕）
+   - 当面验证
+   - Signal/WhatsApp 消息（与邀请链接不同渠道）
+   - **不要**通过共享邀请链接的同一渠道验证
+
+2. **安全分享邀请链接**
+   - 使用端到端加密消息（Signal、WhatsApp）
+   - 当面分享（二维码扫描）
+   - 避免短信、邮件、公开论坛
+
+3. **使用 VPN** - 向对方和网络观察者隐藏 IP 地址
+
+4. **保护设备** - 保持操作系统和浏览器更新
+
+5. **隐私浏览** - 使用隐身/隐私模式
+
+6. **可信网络** - 避免无 VPN 的公共 WiFi
+
+7. **新会话** - 每次对话创建新聊天室（不要重用 peer ID）
+
+### 安全审计
+
+- [ ] 独立安全审计（计划中）
+- [ ] 渗透测试（计划中）
+- [ ] 漏洞赏金计划（计划中）
+
+**发现漏洞？** 请负责任地报告至 [teycir@pxdmail.net](mailto:teycir@pxdmail.net)
 
 ---
 
-## 🛠️ Development
+## 🛠️ 开发指南
 
-### Prerequisites
+### 前置要求
 
 - Node.js 18+
-- npm or yarn
-- Modern browser with WebRTC support
+- npm 或 yarn
+- 支持 WebRTC 的现代浏览器
 
-### Browser Compatibility
+### 浏览器兼容性
 
-**Supported Browsers:**
+**支持的浏览器：**
 
-- Chrome/Chromium (recommended)
+- Chrome/Chromium（推荐）
 - Firefox
 - Edge
 - Safari
-- Brave (with shields down for this site)
+- Brave（需为该站点关闭 Shields）
 
-**Not Compatible:**
+**不兼容：**
 
-- LibreWolf - WebRTC is disabled by default for privacy
-- Tor Browser - WebRTC is blocked for anonymity
-- Browsers with strict WebRTC blocking
+- LibreWolf - 默认禁用 WebRTC 以保护隐私
+- Tor Browser - 阻止 WebRTC 以保护匿名
+- 严格阻止 WebRTC 的浏览器
 
-**Note:** Privacy-focused browsers often disable WebRTC to prevent IP leaks. To use GhostChat with these browsers, you must enable WebRTC in settings (not recommended as it defeats their privacy purpose). Use mainstream browsers with a VPN instead
+**注意：** 注重隐私的浏览器通常禁用 WebRTC 以防止 IP 泄露。要在这些浏览器上使用 GhostChat，必须在设置中启用 WebRTC（不推荐，因为这会破坏其隐私目的）。请改用带 VPN 的主流浏览器。
 
-### Setup
+### 安装与设置
 
 ```bash
-# Install dependencies
+# 安装依赖
 npm install
 
-# Run tests
+# 运行测试
 npm test
 
-# Run E2E tests
+# 运行 E2E 测试
 npm run test:e2e
 
-# Lint code
+# 代码检查
 npm run lint
 
-# Type check
+# 类型检查
 npm run type-check
+
+# 构建生产版本
+npm run build
+
+# 本地预览构建版本
+npm start
 ```
 
-### Environment Variables
+### 环境变量
 
 ```bash
-# Optional: Custom PeerJS server
+# 可选：自定义 PeerJS 服务器
 NEXT_PUBLIC_PEERJS_HOST=your-server.com
 NEXT_PUBLIC_PEERJS_PORT=443
 NEXT_PUBLIC_PEERJS_PATH=/myapp
 ```
 
-### Contributing
+### 贡献指南
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+我们欢迎贡献！请参阅 [CONTRIBUTING.md](CONTRIBUTING.md) 了解指南。
 
-**Ways to contribute:**
+**贡献方式：**
 
-- 🐛 Report bugs
-- 💡 Suggest features
-- 🔧 Submit pull requests
-- 📖 Improve documentation
-- 🌍 Add translations
-- 🎨 Design improvements
+- 🐛 报告 Bug
+- 💡 建议新功能
+- 🔧 提交 Pull Request
+- 📖 改进文档
+- 🌍 添加翻译
+- 🎨 设计改进
 
 ---
 
-## 🚢 Deployment
+## 🚢 部署说明
 
-### Cloudflare Pages (Recommended)
+### Cloudflare Pages（推荐）
+
+**1. 构建前端：**
 
 ```bash
 npm run build
-wrangler pages deploy out
 ```
+
+**2. 部署到 Cloudflare Pages：**
+
+```bash
+# 安装 Wrangler CLI
+npm install -g wrangler
+
+# 登录 Cloudflare
+wrangler login
+
+# 部署前端
+npx wrangler pages deploy out --project-name=ghost-chat
+```
+
+**3. 部署 Cloudflare Workers 信令服务器：**
+
+```bash
+cd cloudflare-worker
+
+# 部署 Worker
+npx wrangler deploy
+```
+
+**4. 配置生产环境别名：**
+
+- 登录 Cloudflare Dashboard
+- 进入 Pages 项目设置
+- 将 Production branch 设置为 `master`
 
 ### Vercel
 
@@ -483,75 +521,114 @@ npm run build
 vercel --prod
 ```
 
-### Self-Hosted
+### 自托管
 
 ```bash
 npm run build
-# Upload /out directory to any static host
-# Nginx, Apache, S3, etc.
+# 上传 /out 目录到任何静态主机
+# Nginx, Apache, S3, 等
 ```
 
 ### Docker
 
 ```bash
+# 构建镜像
 docker build -t ghostchat .
+
+# 运行容器
 docker run -p 3000:3000 ghostchat
 ```
 
-## 📄 License
+### 使用自定义域名
 
-MIT License - see [LICENSE](LICENSE) file for details.
+**Cloudflare Pages 配置：**
 
-**TL;DR:** Free to use, modify, and distribute. No warranty provided.
+1. 在 Cloudflare DNS 设置中添加自定义域名
+2. 在 Pages 项目设置中绑定自定义域名
+3. 等待 SSL 证书自动生成
 
----
+**修改 Worker 域名：**
 
-## 💼 Professional Services
+编辑 `lib/peer-manager.ts`，更新信令服务器地址：
 
-Need custom P2P solutions or privacy-focused applications? I build production-ready secure communication tools.
-
-### Featured Projects
-
-- **[TimeSeal](https://timeseal.online)** ([GitHub](https://github.com/Teycir/Timeseal)) - Cryptographic time-locked vault and dead man's switch with zero-trust encryption
-- **[GhostChat](https://ghost-chat.pages.dev)** - True P2P encrypted chat with WebRTC, no server storage, self-destruct timers
-- **[BurpAPISecuritySuite](https://github.com/Teycir/BurpAPISecuritySuite)** - Professional API security testing toolkit for Burp Suite
-- **[BurpCopyIssues](https://github.com/Teycir/BurpCopyIssues)** - Burp Suite extension for browsing, copying, and exporting scan findings
-- **[BurpWpsScan](https://github.com/Teycir/BurpWpsScan)** - WordPress security scanner for Burp Suite with WPScan API integration
-
-### Services Offered
-
-- 🔒 **Privacy-First Development** - P2P applications, encrypted communication, zero-knowledge systems
-- 🚀 **Web Application Development** - Full-stack development with Next.js, React, TypeScript
-- 🔧 **WebRTC Solutions** - Real-time communication, video/audio streaming, data channels
-- 🛡️ **Security Tool Development** - Burp extensions, penetration testing tools, automation frameworks
-- 🤖 **AI Integration** - LLM-powered applications, intelligent automation, custom AI solutions
-
-**Get in Touch**: [teycirbensoltane.tn](https://teycirbensoltane.tn) | Available for freelance projects and consulting
+```typescript
+const SIGNALING_SERVERS = [
+  'your-custom-worker.your-domain.com',
+  // 添加备用服务器
+];
+```
 
 ---
 
-## 🙏 Acknowledgments
+## 📄 许可证
 
-- [simple-peer](https://github.com/feross/simple-peer) - WebRTC library
-- [PeerJS](https://peerjs.com) - Fallback P2P protocol
-- [Next.js](https://nextjs.org) - React framework
-- [Cloudflare Workers](https://workers.cloudflare.com) - Signaling infrastructure
+MIT License - 详见 [LICENSE](LICENSE) 文件。
+
+**简而言之：** 可自由使用、修改和分发。不提供任何保证。
 
 ---
 
-## 💖 Support
+## 💼 专业服务
 
-If you find GhostChat useful, please:
+需要自定义 P2P 解决方案或注重隐私的应用程序？我构建生产就绪的安全通信工具。
 
-- ⭐ Star this repository
-- 🐦 Share on social media
+### 精选项目
+
+- **[TimeSeal](https://timeseal.online)** ([GitHub](https://github.com/Teycir/Timeseal)) - 加密时间锁定保险库和死手开关，零信任加密
+- **[GhostChat](https://ghost-chat-bxc.pages.dev)** - 真正的 P2P 加密聊天，使用 WebRTC，无服务器存储，自动销毁定时器
+- **[BurpAPISecuritySuite](https://github.com/Teycir/BurpAPISecuritySuite)** - 专业的 API 安全测试工具包，用于 Burp Suite
+- **[BurpCopyIssues](https://github.com/Teycir/BurpCopyIssues)** - Burp Suite 扩展，用于浏览、复制和导出扫描结果
+- **[BurpWpsScan](https://github.com/Teycir/BurpWpsScan)** - WordPress 安全扫描器，用于 Burp Suite，集成 WPScan API
+
+### 提供的服务
+
+- 🔒 **隐私优先开发** - P2P 应用、加密通信、零知识系统
+- 🚀 **Web 应用开发** - 使用 Next.js、React、TypeScript 的全栈开发
+- 🔧 **WebRTC 解决方案** - 实时通信、视频/音频流、数据通道
+- 🛡️ **安全工具开发** - Burp 扩展、渗透测试工具、自动化框架
+- 🤖 **AI 集成** - LLM 驱动的应用、智能自动化、自定义 AI 解决方案
+
+**联系方式**: [teycirbensoltane.tn](https://teycirbensoltane.tn) | 可承接自由职业项目和咨询
+
+---
+
+## 🙏 致谢
+
+- [simple-peer](https://github.com/feross/simple-peer) - WebRTC 库
+- [PeerJS](https://peerjs.com) - 备用 P2P 协议
+- [Next.js](https://nextjs.org) - React 框架
+- [Cloudflare Workers](https://workers.cloudflare.com) - 信令基础设施
+- 所有为隐私和开源做出贡献的开发者
+
+---
+
+## 💖 支持
+
+如果您觉得 GhostChat 有用，请：
+
+- ⭐ 给这个仓库加星
+- 🐦 在社交媒体上分享
+- 💡 提出改进建议
+- 🐛 报告问题
+- 📖 贡献代码
+
+---
+
+## 📞 联系方式
+
+- **问题反馈**: [GitHub Issues](https://github.com/Teycir/GhostChat/issues)
+- **功能建议**: [GitHub Discussions](https://github.com/Teycir/GhostChat/discussions)
+- **安全问题**: [teycir@pxdmail.net](mailto:teycir@pxdmail.net)
+- **作者网站**: [teycirbensoltane.tn](https://teycirbensoltane.tn)
 
 ---
 
 <div align="center">
 
-**Built with ❤️ for privacy**
+**用 ❤️ 为隐私而构建**
 
-[Website](https://ghost-chat.pages.dev) • [GitHub](https://github.com/teycir/ghostchat)
+[官方网站](https://ghost-chat-bxc.pages.dev) • [GitHub](https://github.com/Teycir/GhostChat) • [在线演示](https://ghost-chat-bxc.pages.dev)
+
+**⚠️ 免责声明**: GhostChat 仅供合法用途。用户需对自己的使用行为负责。作者不对滥用承担责任。
 
 </div>
