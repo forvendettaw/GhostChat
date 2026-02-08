@@ -26,10 +26,10 @@ export default function ConnectionStatus({ connected, connecting, latency }: Con
       }}
     >
       {connected
-        ? `✓ Connected ${getSignalIcon()} ${latency ? `${latency}ms` : ""}`
+        ? `✓ 已连接 ${getSignalIcon()} ${latency ? `${latency}ms` : ""}`
         : connecting
-          ? "Establishing connection..."
-          : "✗ Disconnected"}
+          ? "正在建立连接..."
+          : "✗ 未连接"}
     </div>
   );
 }

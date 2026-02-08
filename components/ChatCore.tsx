@@ -9,7 +9,7 @@ import {
   destroy,
 } from "@/lib/peer-manager";
 import { inviteManager } from "@/lib/invite-manager";
-import { isMobile, requestWakeLock, ensureHTTPS } from "@/lib/mobile-utils";
+import { isMobile as checkIsMobile, requestWakeLock, ensureHTTPS } from "@/lib/mobile-utils";
 import { checkRateLimit } from "@/lib/rate-limiter";
 import { validateMessage } from "@/lib/input-validation";
 import { getConnectionErrorMessage } from "@/lib/error-messages";
@@ -72,13 +72,14 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   } | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [latency, setLatency] = useState<number | undefined>(undefined);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selfDestructTimer, setSelfDestructTimer] = useState<number>(300);
   const [messageLimit, setMessageLimit] = useState<number>(50);
   const [remotePeerId, setRemotePeerId] = useState<string>("");
   const [fingerprint, setFingerprint] = useState<string>("");
   const [sessionTimeout, setSessionTimeout] = useState<number>(15);
   const [verificationCode, setVerificationCode] = useState<string>("");
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   const initialized = React.useRef(false);
   const peerConnection = React.useRef<any>(null);
@@ -91,6 +92,19 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const fakeTrafficInterval = React.useRef<NodeJS.Timeout | null>(null);
   const idleBlurTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
+  // 响应式检测
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setScreenWidth(width);
+      setIsMobileView(width < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const uptimeInterval = setInterval(() => {
       setUptime(Math.floor((Date.now() - startTime.current) / 1000));
@@ -100,7 +114,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     initialized.current = true;
 
     (async () => {
-      if (isMobile()) {
+      if (checkIsMobile()) {
         ensureHTTPS();
         requestWakeLock();
       }
@@ -441,32 +455,41 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     e.target.value = "";
   };
 
+  // 响应式样式辅助函数
+  const isMobile = screenWidth < 768;
+  const isSmallMobile = screenWidth < 480;
+
   return (
     <div style={{ height: "100vh", width: "100%", maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <ErrorHandler error={error} />
       {fallbackWarning && (
         <div
           style={{
-            padding: 12,
+            padding: isSmallMobile ? 8 : 12,
             background: "#ff0",
             color: "#000",
-            fontSize: 11,
+            fontSize: isSmallMobile ? 10 : 11,
             textAlign: "center",
             borderBottom: "1px solid #333",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            gap: isSmallMobile ? 4 : 8,
           }}
         >
-          Custom server unavailable. Using free public server (0.peerjs.com)
+          <span>自定义服务器不可用，使用免费公共服务器 (0.peerjs.com)</span>
           <button
             onClick={() => setFallbackWarning(false)}
             style={{
-              marginLeft: 8,
-              padding: "2px 8px",
+              padding: isSmallMobile ? "6px 12px" : "8px 16px",
               background: "#000",
               color: "#ff0",
               border: "none",
               borderRadius: 4,
-              fontSize: 10,
+              fontSize: isSmallMobile ? 10 : 11,
               cursor: "pointer",
+              minHeight: 36,
             }}
           >
             OK
@@ -475,12 +498,12 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       )}
       <div
         style={{
-          padding: 16,
+          padding: isSmallMobile ? 8 : 16,
           borderBottom: "1px solid #333",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 8,
+          gap: isSmallMobile ? 4 : 8,
           position: "relative",
         }}
       >
@@ -488,25 +511,27 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           onClick={() => window.location.href = '/'}
           style={{
             position: "absolute",
-            left: 16,
-            top: 16,
+            left: isSmallMobile ? 8 : 16,
+            top: isSmallMobile ? 8 : 16,
             background: "transparent",
             border: "none",
             color: "#fff",
-            fontSize: 24,
+            fontSize: isSmallMobile ? 20 : 24,
             cursor: "pointer",
-            padding: 8,
+            padding: isSmallMobile ? 6 : 8,
             display: "flex",
             alignItems: "center",
             fontWeight: 900,
             opacity: 0.8,
+            minHeight: 44,
+            minWidth: 44,
           }}
-          title="Back to home"
+          title="返回首页"
         >
           ←
         </button>
-        <div style={{ fontSize: 11, opacity: 0.6, textAlign: "center" }}>
-          Your ID: {peerId.slice(0, 8)}...
+        <div style={{ fontSize: isSmallMobile ? 9 : 11, opacity: 0.6, textAlign: "center" }}>
+          你的 ID: {peerId.slice(0, 8)}...
         </div>
         <button
           onClick={() => {
@@ -518,31 +543,32 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             color: "#000",
             border: "none",
             borderRadius: 6,
-            padding: "8px 20px",
+            padding: isSmallMobile ? "8px 14px" : "8px 20px",
             cursor: "pointer",
             fontWeight: 700,
             display: "flex",
             alignItems: "center",
-            gap: 6,
+            gap: isSmallMobile ? 4 : 6,
+            minHeight: 44,
           }}
         >
-          <span style={{ fontSize: 16, display: 'inline-block', animation: 'pulse 2s ease-in-out infinite' }}>🚨</span>
-          <span style={{ fontSize: 10 }}>CLEAR ALL</span>
+          <span style={{ fontSize: isSmallMobile ? 14 : 16, display: 'inline-block', animation: 'pulse 2s ease-in-out infinite' }}>🚨</span>
+          <span style={{ fontSize: 10 }}>清除全部</span>
         </button>
       </div>
-      <div style={{ padding: "8px 16px 16px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ padding: isSmallMobile ? "6px 12px 12px" : "8px 16px 16px", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <ConnectionStatus connected={connected} connecting={connecting} latency={latency} />
         {fingerprint && (
-          <div style={{ marginTop: 8, padding: 8, background: "#1a1a1a", borderRadius: 6, fontSize: 10, textAlign: "center" }}>
-            <div style={{ marginBottom: 6 }}>
-              <span style={{ opacity: 0.6 }}>Fingerprint: </span>
-              <span style={{ fontSize: 16, letterSpacing: 2 }}>{fingerprint}</span>
+          <div style={{ marginTop: isSmallMobile ? 6 : 8, padding: isSmallMobile ? 6 : 8, background: "#1a1a1a", borderRadius: 6, fontSize: isSmallMobile ? 9 : 10, textAlign: "center", maxWidth: "100%" }}>
+            <div style={{ marginBottom: isSmallMobile ? 4 : 6 }}>
+              <span style={{ opacity: 0.6 }}>指纹: </span>
+              <span style={{ fontSize: isSmallMobile ? 14 : 16, letterSpacing: isSmallMobile ? 1 : 2 }}>{fingerprint}</span>
             </div>
             <div>
-              <span style={{ opacity: 0.6 }}>Verification code: </span>
-              <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 3, color: "#0f0" }}>{verificationCode}</span>
+              <span style={{ opacity: 0.6 }}>验证码: </span>
+              <span style={{ fontSize: isSmallMobile ? 16 : 18, fontWeight: 700, letterSpacing: isSmallMobile ? 2 : 3, color: "#0f0" }}>{verificationCode}</span>
             </div>
-            <div style={{ opacity: 0.5, fontSize: 9, marginTop: 4 }}>Verify peer sees same code (out-of-band)</div>
+            <div style={{ opacity: 0.5, fontSize: isSmallMobile ? 8 : 9, marginTop: isSmallMobile ? 3 : 4 }}>请验证对方看到相同代码</div>
           </div>
         )}
         <InviteSection
@@ -552,31 +578,9 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         />
       </div>
 
-      <div style={{ flex: 1, overflow: "auto", padding: "16px 32px", width: "100%", maxWidth: "100vw", boxSizing: "border-box" }}>
-        {messages.length > 0 && (
-          <div style={{ marginBottom: 12, position: "sticky", top: 0, paddingBottom: 8, zIndex: 10, width: "100%", boxSizing: "border-box" }}>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search messages..."
-              style={{
-                width: "100%",
-                padding: 8,
-                background: "#1a1a1a",
-                border: "1px solid #333",
-                borderRadius: 6,
-                color: "#fff",
-                fontSize: 10,
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-        )}
-        <MessageList 
-          messages={messages} 
-          searchQuery={searchQuery}
+      <div style={{ flex: 1, overflow: "auto", padding: isSmallMobile ? "8px 12px" : "16px 32px", width: "100%", maxWidth: "100vw", boxSizing: "border-box" }}>
+        <MessageList
+          messages={messages}
           onDelete={(id) => {
             deleteMessage(id);
             setMessages(getMessages().slice());
@@ -584,16 +588,16 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           }}
         />
         {isTyping && (
-          <div style={{ opacity: 0.6, fontSize: 11, fontStyle: "italic" }}>
-            Peer is typing...
+          <div style={{ opacity: 0.6, fontSize: isSmallMobile ? 10 : 11, fontStyle: "italic" }}>
+            对方正在输入...
           </div>
         )}
       </div>
 
       {uploadProgress && <UploadProgress {...uploadProgress} />}
-      <div style={{ borderTop: "1px solid #333", padding: "8px 16px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", width: "100%", boxSizing: "border-box" }}>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <label className="tooltip-btn" data-title="Autodelete after" style={{ fontSize: 10, opacity: 0.6, whiteSpace: "nowrap", cursor: "help" }}>Self-destruct:</label>
+      <div style={{ borderTop: "1px solid #333", padding: isSmallMobile ? "6px 12px" : "8px 16px", display: "flex", gap: isSmallMobile ? 8 : 12, alignItems: "center", flexWrap: "wrap", width: "100%", boxSizing: "border-box" }}>
+        <div style={{ display: "flex", gap: isSmallMobile ? 4 : 6, alignItems: "center", flex: isSmallMobile ? "1 1 45%" : "0 1 auto" }}>
+          <label className="tooltip-btn" data-title="自动删除时间" style={{ fontSize: isSmallMobile ? 9 : 10, opacity: 0.6, whiteSpace: "nowrap", cursor: "help" }}>{isMobile ? '自动删除:' : '自动删除:'}</label>
           <select
             value={selfDestructTimer}
             onChange={(e) => setSelfDestructTimer(Number(e.target.value))}
@@ -602,20 +606,21 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
               color: "#fff",
               border: "1px solid #333",
               borderRadius: 4,
-              padding: "4px 8px",
-              fontSize: 10,
+              padding: isSmallMobile ? "8px 10px" : "4px 8px",
+              fontSize: isSmallMobile ? 12 : 10,
               cursor: "pointer",
+              minHeight: 40,
             }}
           >
-            <option value={0}>Never</option>
-            <option value={5}>5s</option>
-            <option value={30}>30s</option>
-            <option value={60}>1m</option>
-            <option value={300}>5m</option>
+            <option value={0}>从不</option>
+            <option value={5}>5秒</option>
+            <option value={30}>30秒</option>
+            <option value={60}>1分钟</option>
+            <option value={300}>5分钟</option>
           </select>
         </div>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <label className="tooltip-btn" data-title="Keep only last N messages" style={{ fontSize: 10, opacity: 0.6, whiteSpace: "nowrap", cursor: "help" }}>Max messages:</label>
+        <div style={{ display: "flex", gap: isSmallMobile ? 4 : 6, alignItems: "center", flex: isSmallMobile ? "1 1 45%" : "0 1 auto" }}>
+          <label className="tooltip-btn" data-title="保留最近N条消息" style={{ fontSize: isSmallMobile ? 9 : 10, opacity: 0.6, whiteSpace: "nowrap", cursor: "help" }}>{isMobile ? '最大:' : '最大消息数:'}</label>
           <select
             value={messageLimit}
             onChange={(e) => {
@@ -629,9 +634,10 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
               color: "#fff",
               border: "1px solid #333",
               borderRadius: 4,
-              padding: "4px 8px",
-              fontSize: 10,
+              padding: isSmallMobile ? "8px 10px" : "4px 8px",
+              fontSize: isSmallMobile ? 12 : 10,
               cursor: "pointer",
+              minHeight: 40,
             }}
           >
             <option value={10}>10</option>
@@ -640,8 +646,8 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             <option value={100}>100</option>
           </select>
         </div>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <label className="tooltip-btn" data-title="Auto-disconnect after inactivity" style={{ fontSize: 10, opacity: 0.6, whiteSpace: "nowrap", cursor: "help" }}>Timeout:</label>
+        <div style={{ display: "flex", gap: isSmallMobile ? 4 : 6, alignItems: "center", flex: isSmallMobile ? "1 1 100%" : "0 1 auto" }}>
+          <label className="tooltip-btn" data-title="无活动后自动断开" style={{ fontSize: isSmallMobile ? 9 : 10, opacity: 0.6, whiteSpace: "nowrap", cursor: "help" }}>{isMobile ? '超时:' : '会话超时:'}</label>
           <select
             value={sessionTimeout}
             onChange={(e) => setSessionTimeout(Number(e.target.value))}
@@ -650,16 +656,17 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
               color: "#fff",
               border: "1px solid #333",
               borderRadius: 4,
-              padding: "4px 8px",
-              fontSize: 10,
+              padding: isSmallMobile ? "8px 10px" : "4px 8px",
+              fontSize: isSmallMobile ? 12 : 10,
               cursor: "pointer",
+              minHeight: 40,
             }}
           >
-            <option value={0}>Never</option>
-            <option value={5}>5m</option>
-            <option value={15}>15m</option>
-            <option value={30}>30m</option>
-            <option value={60}>1h</option>
+            <option value={0}>从不</option>
+            <option value={5}>5分钟</option>
+            <option value={15}>15分钟</option>
+            <option value={30}>30分钟</option>
+            <option value={60}>1小时</option>
           </select>
         </div>
 

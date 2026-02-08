@@ -479,3 +479,87 @@ select option:hover {
   background: #fa0 !important;
   color: #000 !important;
 }
+
+/* ===== 移动端优化 ===== */
+@media (max-width: 768px) {
+  /* 触摸目标最小尺寸 44px (iOS/Android 指南) */
+  button,
+  select,
+  input {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 小屏幕字体优化 */
+  .start-btn {
+    padding: 14px 32px;
+    font-size: 16px;
+  }
+
+  /* Ghost 动画在小屏幕上减小 */
+  .ghost-wisp {
+    font-size: 30px;
+    bottom: -60px;
+  }
+
+  /* Tooltip 在移动端默认隐藏（触摸屏不需要） */
+  .tooltip-btn[data-title]::after,
+  .tooltip-btn[data-title]::before,
+  .tooltip-btn-bottom[data-title]::after,
+  .tooltip-btn-bottom[data-title]::before {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 超小屏幕进一步优化 */
+  .start-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+
+  .ghost-wisp {
+    font-size: 24px;
+  }
+
+  /* 禁用 hover 效果（移动端不适用） */
+  button:hover {
+    transform: none;
+  }
+}
+
+/* 横屏模式优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .ghost-wisp {
+    display: none;
+  }
+
+  .start-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* ===== 微信风格样式 ===== */
+/* 移除旧的 emoji-btn 样式（已移除表情功能） */
+.emoji-btn {
+  background: #fff !important;
+}
+
+/* 微信风格按钮优化 */
+button {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+}
+
+button:hover {
+  background: #f7f7f7;
+  filter: none;
+  transform: none;
+}
+
+button:active {
+  background: #e5e5e5;
+  filter: none;
+  transform: none;
+}

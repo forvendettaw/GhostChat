@@ -31,14 +31,14 @@ export default function ErrorHandler({ error }: ErrorHandlerProps) {
           marginBottom: 8,
         }}
       >
-        {isPeerLeft ? "Peer Disconnected" : "Connection Failed"}
+        {isPeerLeft ? "对方已断开连接" : "连接失败"}
       </div>
       <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 12 }}>
         {error}
       </div>
       {isPeerLeft && (
         <div style={{ fontSize: 10, opacity: 0.6 }}>
-          Redirecting to home in 2 seconds...
+          2秒后返回首页...
         </div>
       )}
 

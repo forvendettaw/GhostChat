@@ -50,14 +50,14 @@ export default function InviteSection({
             fontWeight: 600,
           }}
         >
-          {peerId ? "Create Invite Link" : "Initializing..."}
+          {peerId ? "创建邀请链接" : "初始化中..."}
         </button>
       ) : (
         <div style={{ fontSize: 11, lineHeight: 1.5 }}>
           {inviteLink ? (
             <>
               <div style={{ marginBottom: 8, opacity: 0.8 }}>
-                Share this link with peer:
+                分享此链接给对方:
               </div>
               <div
                 onClick={async () => {
@@ -86,12 +86,12 @@ export default function InviteSection({
                   fontFamily: copied ? "inherit" : "monospace",
                 }}
               >
-                {copied ? "✓ Copied!" : encodeInviteLink(inviteLink)}
+                {copied ? "✓ 已复制!" : encodeInviteLink(inviteLink)}
               </div>
             </>
           ) : (
             <div style={{ marginBottom: 8, opacity: 0.6, fontSize: 10 }}>
-              Generating link...
+              生成链接中...
             </div>
           )}
           {inviteLink && (
@@ -109,7 +109,7 @@ export default function InviteSection({
                     cursor: "pointer",
                   }}
                 >
-                  {showQR ? "Hide QR" : "Show QR"}
+                  {showQR ? "隐藏二维码" : "显示二维码"}
                 </button>
               </div>
               {showQR && (
@@ -143,14 +143,14 @@ export default function InviteSection({
                       fontWeight: 500,
                     }}
                   >
-                    Scan to join chat
+                    扫码加入聊天
                   </div>
                 </div>
               )}
             </>
           )}
           <div style={{ opacity: 0.6, fontSize: 10 }}>
-            Peer pastes code at main page decoder
+            对方在首页解码器中粘贴代码
           </div>
           <div
             style={{
@@ -160,7 +160,7 @@ export default function InviteSection({
               color: "#ff0",
             }}
           >
-            ⚠️ Link expires when you close this tab
+            ⚠️ 关闭标签页后链接失效
           </div>
         </div>
       )}

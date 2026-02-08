@@ -47,29 +47,29 @@ export default function DiagnosticsFooter({
       }}
     >
       <span>
-        Status:{" "}
+        状态:{" "}
         <span
           style={{
             color: connected ? "#0f0" : connecting ? "#ff0" : "#f00",
           }}
         >
-          {connected ? "Connected" : connecting ? "Connecting" : "Disconnected"}
+          {connected ? "已连接" : connecting ? "连接中" : "未连接"}
         </span>
       </span>
-      <span>Protocol: {getCurrentProtocol() || "..."}</span>
+      <span>协议: {getCurrentProtocol() || "..."}</span>
       <span>ID: {peerId ? peerId.slice(0, 8) : "..."}</span>
-      <span>Messages: {messageCount}</span>
-      <span>Queue: {queueLength}</span>
+      <span>消息: {messageCount}</span>
+      <span>队列: {queueLength}</span>
       <span>
-        Uptime: {Math.floor(uptime / 60)}m {uptime % 60}s
+        运行: {Math.floor(uptime / 60)}分 {uptime % 60}秒
       </span>
-      <span>Sent: {(stats.bytesSent / 1024).toFixed(1)}KB</span>
-      <span>Recv: {(stats.bytesReceived / 1024).toFixed(1)}KB</span>
-      <span title={worker}>Server: {serverName}</span>
+      <span>发送: {(stats.bytesSent / 1024).toFixed(1)}KB</span>
+      <span>接收: {(stats.bytesReceived / 1024).toFixed(1)}KB</span>
+      <span title={worker}>服务器: {serverName}</span>
       {error && (
-        <span style={{ color: "#f00" }}>Error: {error.slice(0, 15)}...</span>
+        <span style={{ color: "#f00" }}>错误: {error.slice(0, 15)}...</span>
       )}
-      {fallbackWarning && <span style={{ color: "#ff0" }}>Fallback</span>}
+      {fallbackWarning && <span style={{ color: "#ff0" }}>备用服务器</span>}
     </div>
   );
 }

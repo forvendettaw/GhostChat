@@ -24,7 +24,7 @@ export function AnimatedTagline({ text }: { text: string }) {
         <motion.span
           key={i}
           style={{ display: 'inline-block', textAlign: 'center' }}
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           transition={{
             duration: 0.1,

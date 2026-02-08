@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { getMaxFileSizeMB } from "@/lib/file-transfer";
 
 interface MessageInputProps {
@@ -11,8 +11,6 @@ interface MessageInputProps {
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onTyping: () => void;
 }
-
-const QUICK_EMOJIS = ["👍", "❤️", "😂", "😮", "🔥", "😢", "🙏", "👏", "🎉", "😍", "😎", "🤔", "😱", "💯", "✨"];
 
 export default function MessageInput({
   input,
@@ -25,75 +23,35 @@ export default function MessageInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingTimer = useRef<NodeJS.Timeout | null>(null);
+  const [screenWidth, setScreenWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
+
+  // 响应式检测
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = screenWidth < 768;
+  const isSmallMobile = screenWidth < 480;
 
   const maxChars = 500;
 
-  const wrapText = (prefix: string, suffix: string) => {
-    const el = inputRef.current;
-    if (!el) return;
-    const start = el.selectionStart || 0;
-    const end = el.selectionEnd || 0;
-    const selected = input.substring(start, end);
-    const newText = input.substring(0, start) + prefix + selected + suffix + input.substring(end);
-    setInput(newText);
-    setTimeout(() => {
-      el.focus();
-      el.setSelectionRange(start + prefix.length, end + prefix.length);
-    }, 0);
-  };
-
   return (
-    <div style={{ borderTop: "1px solid #333" }}>
-      {input.length > 0 && (
-        <div
-          style={{
-            padding: "4px 16px",
-            fontSize: 10,
-            opacity: 0.6,
-            textAlign: "right",
-          }}
-        >
-          {input.length}/{maxChars}
-        </div>
-      )}
-      <div
-        style={{
-          padding: "8px 16px",
-          display: "flex",
-          gap: 4,
-          borderBottom: "1px solid #222",
-          flexWrap: "wrap",
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <button onClick={() => wrapText('# ', '')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontWeight: "bold" }} data-title="# Heading" className="tooltip-btn">H1</button>
-        <button onClick={() => wrapText('## ', '')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontWeight: "bold" }} data-title="## Subheading" className="tooltip-btn">H2</button>
-        <button onClick={() => wrapText('### ', '')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontWeight: "bold" }} data-title="### Small Heading" className="tooltip-btn">H3</button>
-        <button onClick={() => wrapText('**', '**')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontWeight: "bold" }} data-title="**Bold**" className="tooltip-btn">B</button>
-        <button onClick={() => wrapText('*', '*')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontStyle: "italic" }} data-title="*Italic*" className="tooltip-btn">I</button>
-        <button onClick={() => wrapText('__', '__')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, textDecoration: "underline" }} data-title="__Underline__" className="tooltip-btn">U</button>
-        <button onClick={() => wrapText('~~', '~~')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, textDecoration: "line-through" }} data-title="~~Strikethrough~~" className="tooltip-btn">S</button>
-        <button onClick={() => wrapText('==', '==')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#ff0" : "#111", border: "1px solid #333", borderRadius: 4, color: "#000", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="==Highlight==" className="tooltip-btn">H</button>
-        <button onClick={() => wrapText('`', '`')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontFamily: "monospace" }} data-title="`Code`" className="tooltip-btn">{"<>"}</button>
-        <button onClick={() => wrapText('```\n', '\n```')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11, fontFamily: "monospace" }} data-title="```Code Block```" className="tooltip-btn">{"{}"}</button>
-
-        <button onClick={() => wrapText('[', '](url)')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="[Link](url)" className="tooltip-btn">🔗</button>
-        <button onClick={() => wrapText('![alt](', ')')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="![Image](url)" className="tooltip-btn">🖼️</button>
-        <button onClick={() => wrapText('^', '^')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="^Superscript^" className="tooltip-btn">x²</button>
-        <button onClick={() => wrapText('~', '~')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="~Subscript~" className="tooltip-btn">x₂</button>
-        <button onClick={() => wrapText('---\n', '')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="--- Horizontal Rule" className="tooltip-btn">─</button>
-        <button onClick={() => wrapText('| ', ' |')} disabled={!connected} style={{ padding: "4px 8px", background: connected ? "#222" : "#111", border: "1px solid #333", borderRadius: 4, color: connected ? "#fff" : "#666", cursor: connected ? "pointer" : "not-allowed", fontSize: 11 }} data-title="| Table |" className="tooltip-btn">☷</button>
-      </div>
-      <div
-        style={{
-          padding: 16,
-          display: "flex",
-          gap: 8,
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
+    <div
+      style={{
+        padding: isSmallMobile ? "8px 12px" : "10px 16px",
+        display: "flex",
+        gap: isSmallMobile ? 8 : 10,
+        alignItems: "center",
+        background: "#f7f7f7",
+        borderTop: "1px solid #e5e5e5",
+      }}
+    >
       <input
         type="file"
         ref={fileInputRef}
@@ -105,15 +63,21 @@ export default function MessageInput({
         onClick={() => fileInputRef.current?.click()}
         disabled={!connected}
         style={{
-          padding: "12px",
-          background: connected ? "#333" : "#222",
-          border: "none",
-          borderRadius: 8,
-          color: connected ? "#fff" : "#666",
+          padding: isSmallMobile ? "10px" : "12px",
+          background: connected ? "#fff" : "#e5e5e5",
+          border: "1px solid #e5e5e5",
+          borderRadius: 6,
+          color: connected ? "#000" : "#999",
           cursor: connected ? "pointer" : "not-allowed",
-          fontSize: 16,
+          fontSize: isSmallMobile ? 18 : 20,
+          fontWeight: "bold",
+          minHeight: 44,
+          minWidth: 44,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-        data-title="<=10MB"
+        data-title="上传文件（最大10MB）"
         className="tooltip-btn"
       >
         +
@@ -134,41 +98,40 @@ export default function MessageInput({
             onSend();
           }
         }}
-        placeholder={
-          connected ? "Type a message and hit enter..." : "Waiting for connection..."
-        }
+        placeholder={connected ? "发消息..." : "等待连接..."}
         disabled={!connected}
         style={{
           flex: 1,
-          padding: 12,
-          background: connected ? "#fff" : "#111",
-          border: "1px solid #333",
-          borderRadius: 8,
-          color: connected ? "#000" : "#666",
+          padding: isSmallMobile ? "10px 12px" : "12px 14px",
+          background: connected ? "#fff" : "#e5e5e5",
+          border: "none",
+          borderRadius: 6,
+          color: connected ? "#000" : "#999",
           outline: "none",
           cursor: connected ? "text" : "not-allowed",
+          fontSize: isSmallMobile ? 15 : 16,
+          minHeight: 44,
         }}
         maxLength={maxChars}
       />
-      {QUICK_EMOJIS.map((emoji) => (
-        <button
-          key={emoji}
-          onClick={() => setInput(input + emoji)}
-          disabled={!connected}
-          className="emoji-btn"
-          style={{
-            padding: "6px 8px",
-            background: connected ? "#333" : "#222",
-            border: "none",
-            borderRadius: 6,
-            cursor: connected ? "pointer" : "not-allowed",
-            fontSize: 14,
-          }}
-        >
-          {emoji}
-        </button>
-      ))}
-      </div>
+      <button
+        onClick={onSend}
+        disabled={!connected || !input.trim()}
+        style={{
+          background: connected && input.trim() ? "#95ec69" : "#e5e5e5",
+          color: connected && input.trim() ? "#000" : "#999",
+          padding: isSmallMobile ? "10px 18px" : "12px 22px",
+          borderRadius: 6,
+          border: "none",
+          fontSize: isSmallMobile ? 14 : 15,
+          fontWeight: 500,
+          cursor: connected && input.trim() ? "pointer" : "not-allowed",
+          minHeight: 44,
+          minWidth: 60,
+        }}
+      >
+        发送
+      </button>
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default function UploadProgress({ fileName, sent, total }: UploadProgress
         fontSize: 10,
       }}
     >
-      <div style={{ marginBottom: 4 }}>Uploading: {fileName}</div>
+      <div style={{ marginBottom: 4 }}>正在上传: {fileName}</div>
       <div
         style={{
           background: "#333",
@@ -35,7 +35,7 @@ export default function UploadProgress({ fileName, sent, total }: UploadProgress
         />
       </div>
       <div style={{ marginTop: 4, opacity: 0.7 }}>
-        {sent} / {total} chunks
+        {sent} / {total} 分块
       </div>
     </div>
   );

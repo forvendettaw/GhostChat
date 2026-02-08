@@ -1,6 +1,7 @@
 name = "ghostchat-signaling"
 main = "index.js"
 compatibility_date = "2024-01-01"
+account_id = "355cd216e930b3561aed915bc7d9d42d"
 
 [[durable_objects.bindings]]
 name = "PEER_SESSION"
