@@ -10,6 +10,23 @@ const DB_NAME = 'ghostchat-invites';
 const STORE_NAME = 'invites';
 const EXPIRY_HOURS = 24;
 
+// UUID 生成器（兼容不支持 crypto.randomUUID() 的浏览器）
+function generateUUID(): string {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+  } catch (e) {
+    console.warn('[UUID] crypto.randomUUID() not available, using fallback');
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 class InviteManager {
   private db: IDBDatabase | null = null;
 
@@ -34,8 +51,8 @@ class InviteManager {
 
   async createInvite(peerId: string): Promise<string> {
     if (!this.db) await this.init();
-    
-    const inviteId = crypto.randomUUID();
+
+    const inviteId = generateUUID();
     const invite: InviteData = {
       id: inviteId,
       peerId,
