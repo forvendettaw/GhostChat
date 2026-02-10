@@ -32,35 +32,42 @@ async function tryConnectWorker(
     };
     
     ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      
-      if (msg.type === 'OPEN') {
-        console.log('[SIMPLEPEER] Server acknowledged');
-        return;
-      }
-      
-      if (msg.type === 'SIGNAL' && msg.signal) {
-        if (!peer) {
-          console.log('[SIMPLEPEER] Incoming connection from:', msg.src);
-          remotePeerId = msg.src;
+      try {
+        const msg = JSON.parse(event.data);
+        console.log('[SIMPLEPEER] Received message type:', msg.type, 'from:', msg.src);
 
-          // 移动端检测和配置
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          console.log('[SIMPLEPEER] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
-
-          peer = new SimplePeer({
-            initiator: false,
-            config: {
-              iceServers: getTURNServers(),
-              // 强制使用中继，改善 VPN 和移动端的连接成功率
-              iceTransportPolicy: 'relay'
-            }
-          });
-
-          setupPeer(peer, storedOnMessage!, storedOnConnect!, storedOnDisconnect, msg.src);
+        if (msg.type === 'OPEN') {
+          console.log('[SIMPLEPEER] Server acknowledged');
+          return;
         }
 
-        peer.signal(msg.signal);
+        if (msg.type === 'SIGNAL' && msg.signal) {
+          console.log('[SIMPLEPEER] Signal received from:', msg.src, 'peer exists:', !!peer);
+          if (!peer) {
+            console.log('[SIMPLEPEER] Creating new peer for incoming connection from:', msg.src);
+            remotePeerId = msg.src;
+
+            // 移动端检测和配置
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            console.log('[SIMPLEPEER] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
+
+            peer = new SimplePeer({
+              initiator: false,
+              config: {
+                iceServers: getTURNServers(),
+                // 强制使用中继，改善 VPN 和移动端的连接成功率
+                iceTransportPolicy: 'relay'
+              }
+            });
+
+            setupPeer(peer, storedOnMessage!, storedOnConnect!, storedOnDisconnect, msg.src);
+          }
+
+          peer.signal(msg.signal);
+          console.log('[SIMPLEPEER] Signal processed, peer state:', peer.connected ? 'connected' : 'connecting');
+        }
+      } catch (err) {
+        console.error('[SIMPLEPEER] Error processing message:', err);
       }
     };
     
@@ -71,10 +78,17 @@ async function tryConnectWorker(
 
     ws.onclose = () => {
       console.log('[SIMPLEPEER] WebSocket closed');
+      // 只有在 P2P 连接已建立的情况下才调用 disconnect
+      // 如果只是 WebSocket 关闭但 P2P 还没连接，不要触发 disconnect
       if (peer && peer.connected) {
         peer.destroy();
+        if (storedOnDisconnect) storedOnDisconnect('peer-left');
+      } else if (peer) {
+        // 如果 peer 存在但未连接，说明连接尝试失败了
+        console.error('[SIMPLEPEER] WebSocket closed before P2P connection established');
+        peer.destroy();
+        if (storedOnDisconnect) storedOnDisconnect('connection-failed');
       }
-      if (storedOnDisconnect) storedOnDisconnect('peer-left');
     };
 
     // 移动端网络可能较慢，增加超时时间到 30 秒

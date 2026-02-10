@@ -49,6 +49,14 @@ export function getConnectionErrorMessage(error: any): string {
     return "Connection timeout. If using VPN, try disabling it and reconnect.";
   }
 
+  if (errorType === "connection-failed") {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      return "连接失败。请确保：1) 双方都在同一页面；2) 网络连接稳定；3) 尝试刷新页面重新生成邀请链接。";
+    }
+    return "Connection failed. Please make sure both parties are on the same page and try refreshing.";
+  }
+
   return "Connection failed. Check Diagnostics for details.";
 }
 
