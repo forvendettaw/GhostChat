@@ -17,7 +17,7 @@ const TURN_PROVIDERS: TURNProvider[] = [
     ],
     priority: 1
   },
-  // Metered.ca free TURN (2024 working)
+  // Metered.ca free TURN - 支持端口80/443，移动端友好
   {
     urls: [
       'turn:openrelay.metered.ca:80',
@@ -39,14 +39,32 @@ const TURN_PROVIDERS: TURNProvider[] = [
     urls: 'stun:stun.cloudflare.com:3478',
     priority: 4
   },
-  // Additional STUN servers for mobile compatibility
+  // 使用社区提供的免费TURN服务器（支持移动端）
+  // 来源: https://gist.github.com/sagivo/3a4b2f2c7ac6e1b5267c2f1f59ac6c6b
   {
-    urls: 'stun:stun.miwifi.com:3478',
+    urls: 'turn:numb.viagenie.ca:3478',
+    username: 'webrtc@live.com',
+    credential: 'muazkh',
     priority: 5
   },
   {
-    urls: 'stun:stun.syncthing.net:3478',
+    urls: [
+      'stun:stun.l.google.com:19302',
+      'stun:stun1.l.google.com:19302',
+      'stun:stun2.l.google.com:19302',
+      'stun:stun3.l.google.com:19302',
+      'stun:stun4.l.google.com:19302'
+    ],
     priority: 6
+  },
+  // Additional STUN servers for mobile compatibility
+  {
+    urls: 'stun:stun.miwifi.com:3478',
+    priority: 7
+  },
+  {
+    urls: 'stun:stun.syncthing.net:3478',
+    priority: 8
   }
 ];
 
