@@ -91,9 +91,9 @@ async function tryConnectWorker(
       }
     };
 
-    // 移动端网络可能较慢，增加超时时间到 30 秒
+    // 移动端网络可能较慢，增加超时时间到 45 秒
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const timeout = isMobile ? 30000 : 15000;
+    const timeout = isMobile ? 45000 : 20000;
     setTimeout(() => {
       if (ws?.readyState !== WebSocket.OPEN) {
         reject(new Error('Worker timeout'));
@@ -224,7 +224,7 @@ function setupPeer(
 
   // 设置 ICE 连接超时（移动端需要更长时间）
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const timeoutMs = isMobile ? 45000 : 30000; // 移动端 45 秒，桌面 30 秒
+  const timeoutMs = isMobile ? 90000 : 45000; // 移动端 90 秒，桌面 45 秒
 
   connectionTimeout = setTimeout(() => {
     if (!p.connected) {

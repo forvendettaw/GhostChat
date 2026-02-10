@@ -302,7 +302,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
 
           // 移动端需要更长的连接超时时间
           const isMobile = checkIsMobile();
-          const connectionTimeoutMs = isMobile ? 45000 : 30000;
+          const connectionTimeoutMs = isMobile ? 90000 : 45000;
 
           connectionTimeout.current = setTimeout(() => {
             if (!connected) {
