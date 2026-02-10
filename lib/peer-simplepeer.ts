@@ -216,11 +216,24 @@ export function connectSimplePeer(
   onDisconnect?: (reason?: string) => void
 ) {
   console.log('[SIMPLEPEER] Connecting to:', targetPeerId);
+  console.log('[SIMPLEPEER] WebSocket state:', ws?.readyState, '(0=CONNECTING, 1=OPEN, 2=CLOSING, 3=CLOSED)');
+
+  // 检查 WebSocket 是否已连接
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    console.error('[SIMPLEPEER] WebSocket not ready! State:', ws?.readyState);
+    if (onDisconnect) {
+      onDisconnect('network-error');
+    }
+    return;
+  }
+
   remotePeerId = targetPeerId;
 
   // 移动端检测和配置
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   console.log('[SIMPLEPEER] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
+  console.log('[SIMPLEPEER] My ID:', myId);
+  console.log('[SIMPLEPEER] Target ID:', targetPeerId);
 
   peer = new SimplePeer({
     initiator: true,

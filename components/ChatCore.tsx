@@ -24,6 +24,23 @@ import { containsSensitiveContent } from "@/lib/sensitive-content";
 import { generateFingerprint } from "@/lib/connection-fingerprint";
 import { stripImageMetadata } from "@/lib/metadata-stripper";
 
+// Fallback UUID generator for iOS Chrome compatibility
+const generateUUID = (): string => {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+  } catch (e) {
+    console.warn('[UUID] crypto.randomUUID() not available, using fallback');
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 
 import ErrorHandler from "./ErrorHandler";
 import ConnectionStatus from "./ConnectionStatus";
@@ -114,31 +131,32 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     initialized.current = true;
 
     (async () => {
-      // WebRTC 能力检测
-      const isWebRTCSupported = () => {
-        const w = window as any;
-        return !!(w.RTCPeerConnection || w.webkitRTCPeerConnection || w.mozRTCPeerConnection || w.RTCIceGatherer);
-      };
+      try {
+        // WebRTC 能力检测
+        const isWebRTCSupported = () => {
+          const w = window as any;
+          return !!(w.RTCPeerConnection || w.webkitRTCPeerConnection || w.mozRTCPeerConnection || w.RTCIceGatherer);
+        };
 
-      console.log('[WebRTC] Browser Support Check:');
-      console.log('[WebRTC] - RTCPeerConnection:', !!(window as any).RTCPeerConnection);
-      console.log('[WebRTC] - getUserMedia:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
-      console.log('[WebRTC] - WebSocket:', !!window.WebSocket);
-      console.log('[WebRTC] - User Agent:', navigator.userAgent);
-      console.log('[WebRTC] - Platform:', navigator.platform);
-      console.log('[WebRTC] - Supported:', isWebRTCSupported());
+        console.log('[WebRTC] Browser Support Check:');
+        console.log('[WebRTC] - RTCPeerConnection:', !!(window as any).RTCPeerConnection);
+        console.log('[WebRTC] - getUserMedia:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+        console.log('[WebRTC] - WebSocket:', !!window.WebSocket);
+        console.log('[WebRTC] - User Agent:', navigator.userAgent);
+        console.log('[WebRTC] - Platform:', navigator.platform);
+        console.log('[WebRTC] - Supported:', isWebRTCSupported());
 
-      if (!isWebRTCSupported()) {
-        setError('您的浏览器不支持 WebRTC。请使用 Chrome、Firefox、Safari 或 Edge 最新版本。');
-        return;
-      }
+        if (!isWebRTCSupported()) {
+          setError('您的浏览器不支持 WebRTC。请使用 Chrome、Firefox、Safari 或 Edge 最新版本。');
+          return;
+        }
 
-      if (checkIsMobile()) {
-        ensureHTTPS();
-        requestWakeLock();
-      }
+        if (checkIsMobile()) {
+          ensureHTTPS();
+          requestWakeLock();
+        }
 
-      const handleMessage = (fromPeerId: string, data: string) => {
+        const handleMessage = (fromPeerId: string, data: string) => {
         if (data === "__typing__") {
           setIsTyping(true);
           if (typingTimeout.current) clearTimeout(typingTimeout.current);
@@ -183,7 +201,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             const fileData = deserializeFileMessage(data);
             if (fileData) {
               console.log(`[FILE] Received file: ${fileData.name}, size: ${fileData.size} bytes`);
-              const id = crypto.randomUUID();
+              const id = generateUUID();
               storeMessage({ id, text: "", peerId: fromPeerId, isSelf: false, file: fileData });
               setMessages(getMessages().slice());
             }
@@ -197,7 +215,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           const fileData = deserializeFileMessage(data);
           if (fileData) {
             console.log(`[FILE] Received file: ${fileData.name}, size: ${fileData.size} bytes`);
-            const id = crypto.randomUUID();
+            const id = generateUUID();
             storeMessage({ id, text: "", peerId: fromPeerId, isSelf: false, file: fileData });
             setMessages(getMessages().slice());
           }
@@ -381,6 +399,11 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         document.removeEventListener('mousedown', resetInactivity);
         document.removeEventListener('keydown', resetInactivity);
       };
+      } catch (err) {
+        console.error('[INIT] Initialization error:', err);
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        setError(`初始化失败: ${errorMsg}。请尝试刷新页面或使用其他浏览器。`);
+      }
     })();
   }, []);
 
@@ -400,7 +423,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       return;
     }
 
-    const id = crypto.randomUUID();
+    const id = generateUUID();
     const expiresAt = selfDestructTimer > 0 ? Date.now() + selfDestructTimer * 1000 : undefined;
     const sensitive = containsSensitiveContent(input);
     storeMessage({ id, text: input, peerId, isSelf: true, expiresAt, sensitive });
@@ -436,7 +459,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       return;
     }
 
-    const id = crypto.randomUUID();
+    const id = generateUUID();
     storeMessage({ id, text: "", peerId, isSelf: true, file: result.fileData });
     setMessages(getMessages().slice());
 
