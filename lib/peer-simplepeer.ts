@@ -54,10 +54,8 @@ async function tryConnectWorker(
               iceTransportPolicy: 'all',
               // 移动端需要更长的 ICE 收集时间
               iceCandidatePoolSize: isMobile ? 10 : 4
-            },
-            // 增加移动端的连接超时
-            timeout: isMobile ? 30000 : 15000
-          });
+            }
+          } as any);
 
           setupPeer(peer, storedOnMessage!, storedOnConnect!, storedOnDisconnect, msg.src);
         }
@@ -198,10 +196,8 @@ export function connectSimplePeer(
       iceTransportPolicy: 'all',
       // 移动端需要更长的 ICE 收集时间
       iceCandidatePoolSize: isMobile ? 10 : 4
-    },
-    // 增加移动端的连接超时
-    timeout: isMobile ? 30000 : 15000
-  });
+    }
+  } as any);
 
   setupPeer(peer, onMessage, onConnect, onDisconnect, targetPeerId);
 }
