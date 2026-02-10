@@ -82,6 +82,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [error, setError] = useState<string | null>(null);
   const [fallbackWarning, setFallbackWarning] = useState(false);
   const [uptime, setUptime] = useState(0);
+  const [hasConnected, setHasConnected] = useState(false); // 跟踪是否曾经成功连接过
   const [uploadProgress, setUploadProgress] = useState<{
     fileName: string;
     sent: number;
@@ -226,6 +227,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
       const handleConnect = (remote?: string, myPeerId?: string) => {
         console.log('[FINGERPRINT] handleConnect called with remote:', remote, 'myPeerId:', myPeerId);
         setConnected(true);
+        setHasConnected(true); // 标记已成功连接过
         setConnecting(false);
         initAudioContext();
         if (connectionTimeout.current) {
@@ -255,10 +257,19 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
         setConnecting(false);
         setLatency(undefined);
         peerConnection.current = null;
-        destroy();
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+
+        // 只在曾经成功连接过的情况下才跳转回首页
+        // 如果是初始连接失败，只显示错误消息
+        if (hasConnected) {
+          destroy();
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        } else {
+          destroy();
+          // 初始连接失败，显示错误消息但不跳转
+          setError(getConnectionErrorMessage({ type: reason || 'network-error' }));
+        }
       };
 
       const handleFallback = () => {
