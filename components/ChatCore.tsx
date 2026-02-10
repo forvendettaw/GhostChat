@@ -251,13 +251,17 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
             (remote?: string) => handleConnect(remote, peer.id),
             handleDisconnect,
           );
-          
+
+          // 移动端需要更长的连接超时时间
+          const isMobile = checkIsMobile();
+          const connectionTimeoutMs = isMobile ? 45000 : 30000;
+
           connectionTimeout.current = setTimeout(() => {
             if (!connected) {
               setConnecting(false);
               setError(getConnectionErrorMessage({ type: "peer-unavailable" }));
             }
-          }, 30000);
+          }, connectionTimeoutMs);
         }
       }
 

@@ -14,7 +14,7 @@ No servers storing or reading your conversations. Everything exists only in memo
 [![simple-peer](https://img.shields.io/badge/simple--peer-9-green)](https://github.com/feross/simple-peer)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange)](https://workers.cloudflare.com)
 
-[Live Demo](https://ghost-chat.pages.dev) • [Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
+[Contributing](CONTRIBUTING.md) • [Changelog](CHANGELOG.md)
 
 **🎥 [Watch Demo Video](https://sendspark.com/share/jq2rruwx9q3s97gbswef1sabm09ofzye)**
 
@@ -146,11 +146,9 @@ Most "secure" messaging apps still store your messages on servers. Even Signal a
 
 ### For Users
 
-**1. Visit the app:**
+**1. Deploy and visit:**
 
-```
-https://ghost-chat.pages.dev
-```
+Deploy to Cloudflare Pages, Vercel, or Netlify, then visit your domain.
 
 **2. Create a room:**
 
@@ -513,7 +511,7 @@ Need custom P2P solutions or privacy-focused applications? I build production-re
 ### Featured Projects
 
 - **[TimeSeal](https://timeseal.online)** ([GitHub](https://github.com/Teycir/Timeseal)) - Cryptographic time-locked vault and dead man's switch with zero-trust encryption
-- **[GhostChat](https://ghost-chat.pages.dev)** - True P2P encrypted chat with WebRTC, no server storage, self-destruct timers
+- **[GhostChat](https://github.com/teycir/ghostchat)** - True P2P encrypted chat with WebRTC, no server storage, self-destruct timers
 - **[BurpAPISecuritySuite](https://github.com/Teycir/BurpAPISecuritySuite)** - Professional API security testing toolkit for Burp Suite
 - **[BurpCopyIssues](https://github.com/Teycir/BurpCopyIssues)** - Burp Suite extension for browsing, copying, and exporting scan findings
 - **[BurpWpsScan](https://github.com/Teycir/BurpWpsScan)** - WordPress security scanner for Burp Suite with WPScan API integration
@@ -552,6 +550,6 @@ If you find GhostChat useful, please:
 
 **Built with ❤️ for privacy**
 
-[Website](https://ghost-chat.pages.dev) • [GitHub](https://github.com/teycir/ghostchat)
+[GitHub](https://github.com/teycir/ghostchat)
 
 </div>

@@ -13,7 +13,7 @@
 [![WebRTC](https://img.shields.io/badge/WebRTC-P2P-orange)](https://webrtc.org)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange)](https://workers.cloudflare.com)
 
-[在线演示](https://ghost-chat-bxc.pages.dev) • [贡献指南](CONTRIBUTING.md) • [更新日志](CHANGELOG.md)
+[贡献指南](CONTRIBUTING.md) • [更新日志](CHANGELOG.md)
 
 **🎥 [观看演示视频](https://www.youtube.com/watch?v=4-Iw9r4g8D0)**
 
@@ -147,9 +147,7 @@
 
 **1. 访问应用：**
 
-```
-https://ghost-chat-bxc.pages.dev
-```
+部署到 Cloudflare Pages、Vercel 或 Netlify 后访问您的域名。
 
 **2. 创建聊天室：**
 
@@ -575,7 +573,7 @@ MIT License - 详见 [LICENSE](LICENSE) 文件。
 ### 精选项目
 
 - **[TimeSeal](https://timeseal.online)** ([GitHub](https://github.com/Teycir/Timeseal)) - 加密时间锁定保险库和死手开关，零信任加密
-- **[GhostChat](https://ghost-chat-bxc.pages.dev)** - 真正的 P2P 加密聊天，使用 WebRTC，无服务器存储，自动销毁定时器
+- **[GhostChat](https://github.com/teycir/ghostchat)** - 真正的 P2P 加密聊天，使用 WebRTC，无服务器存储，自动销毁定时器
 - **[BurpAPISecuritySuite](https://github.com/Teycir/BurpAPISecuritySuite)** - 专业的 API 安全测试工具包，用于 Burp Suite
 - **[BurpCopyIssues](https://github.com/Teycir/BurpCopyIssues)** - Burp Suite 扩展，用于浏览、复制和导出扫描结果
 - **[BurpWpsScan](https://github.com/Teycir/BurpWpsScan)** - WordPress 安全扫描器，用于 Burp Suite，集成 WPScan API
@@ -627,7 +625,7 @@ MIT License - 详见 [LICENSE](LICENSE) 文件。
 
 **用 ❤️ 为隐私而构建**
 
-[官方网站](https://ghost-chat-bxc.pages.dev) • [GitHub](https://github.com/Teycir/GhostChat) • [在线演示](https://ghost-chat-bxc.pages.dev)
+[GitHub](https://github.com/Teycir/GhostChat)
 
 **⚠️ 免责声明**: GhostChat 仅供合法用途。用户需对自己的使用行为负责。作者不对滥用承担责任。
 

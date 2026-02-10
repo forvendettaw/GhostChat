@@ -189,7 +189,7 @@ export default function MessageList({
                     Math.ceil((msg.expiresAt - now) / 1000),
                   );
                   return (
-                    <span style={{ color: remaining <= 5 ? "#f00" : "#fff" }}>
+                    <span style={{ color: remaining <= 5 ? "#f00" : "#999" }}>
                       ⏱️ {remaining}s
                     </span>
                   );

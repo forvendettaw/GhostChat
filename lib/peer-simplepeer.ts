@@ -43,25 +43,34 @@ async function tryConnectWorker(
         if (!peer) {
           console.log('[SIMPLEPEER] Incoming connection from:', msg.src);
           remotePeerId = msg.src;
+
+          // 移动端需要更长的 ICE 收集超时时间
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
           peer = new SimplePeer({
             initiator: false,
-            config: { 
+            config: {
               iceServers: getTURNServers(),
-              iceTransportPolicy: 'all'
-            }
+              iceTransportPolicy: 'all',
+              // 移动端需要更长的 ICE 收集时间
+              iceCandidatePoolSize: isMobile ? 10 : 4
+            },
+            // 增加移动端的连接超时
+            timeout: isMobile ? 30000 : 15000
           });
-          
+
           setupPeer(peer, storedOnMessage!, storedOnConnect!, storedOnDisconnect, msg.src);
         }
-        
+
         peer.signal(msg.signal);
       }
     };
     
     ws.onerror = (err) => {
+      console.error('[SIMPLEPEER] WebSocket error:', err);
       reject(err);
     };
-    
+
     ws.onclose = () => {
       console.log('[SIMPLEPEER] WebSocket closed');
       if (peer && peer.connected) {
@@ -69,8 +78,15 @@ async function tryConnectWorker(
       }
       if (storedOnDisconnect) storedOnDisconnect('peer-left');
     };
-    
-    setTimeout(() => reject(new Error('Worker timeout')), 5000);
+
+    // 移动端网络可能较慢，增加超时时间到 15 秒
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const timeout = isMobile ? 15000 : 8000;
+    setTimeout(() => {
+      if (ws?.readyState !== WebSocket.OPEN) {
+        reject(new Error('Worker timeout'));
+      }
+    }, timeout);
   });
 }
 
@@ -171,15 +187,22 @@ export function connectSimplePeer(
 ) {
   console.log('[SIMPLEPEER] Connecting to:', targetPeerId);
   remotePeerId = targetPeerId;
-  
+
+  // 移动端需要更长的 ICE 收集超时时间
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
   peer = new SimplePeer({
     initiator: true,
-    config: { 
+    config: {
       iceServers: getTURNServers(),
-      iceTransportPolicy: 'all'
-    }
+      iceTransportPolicy: 'all',
+      // 移动端需要更长的 ICE 收集时间
+      iceCandidatePoolSize: isMobile ? 10 : 4
+    },
+    // 增加移动端的连接超时
+    timeout: isMobile ? 30000 : 15000
   });
-  
+
   setupPeer(peer, onMessage, onConnect, onDisconnect, targetPeerId);
 }
 

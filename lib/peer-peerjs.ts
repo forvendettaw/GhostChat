@@ -39,7 +39,10 @@ export async function initPeerJS(
       reject(err);
     });
 
-    setTimeout(() => reject(new Error('PeerJS timeout')), 10000);
+    // 移动端网络可能较慢，增加超时时间
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const timeout = isMobile ? 20000 : 12000;
+    setTimeout(() => reject(new Error('PeerJS timeout')), timeout);
   });
 }
 
