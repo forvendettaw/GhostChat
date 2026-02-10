@@ -18,10 +18,18 @@ export async function initPeerJS(
 ): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const id = Math.random().toString(36).substr(2, 9);
-    
+
+    // 移动端检测
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('[PEERJS] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
+
     peer = new Peer(id, {
       ...CONFIG,
-      config: { iceServers: getTURNServers() },
+      config: {
+        iceServers: getTURNServers(),
+        // 移动端强制使用中继
+        iceTransportPolicy: isMobile ? 'relay' : 'all'
+      },
       debug: 2
     });
 
@@ -40,8 +48,7 @@ export async function initPeerJS(
     });
 
     // 移动端网络可能较慢，增加超时时间
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const timeout = isMobile ? 20000 : 12000;
+    const timeout = isMobile ? 30000 : 15000;
     setTimeout(() => reject(new Error('PeerJS timeout')), timeout);
   });
 }

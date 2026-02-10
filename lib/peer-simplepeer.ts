@@ -77,9 +77,9 @@ async function tryConnectWorker(
       if (storedOnDisconnect) storedOnDisconnect('peer-left');
     };
 
-    // 移动端网络可能较慢，增加超时时间到 15 秒
+    // 移动端网络可能较慢，增加超时时间到 30 秒
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const timeout = isMobile ? 15000 : 8000;
+    const timeout = isMobile ? 30000 : 15000;
     setTimeout(() => {
       if (ws?.readyState !== WebSocket.OPEN) {
         reject(new Error('Worker timeout'));
@@ -174,6 +174,17 @@ function setupPeer(
 
       pc.onconnectionstatechange = () => {
         console.log('[SIMPLEPEER] Connection state:', pc.connectionState);
+      };
+
+      // 添加 ICE 候选收集日志
+      pc.onicecandidate = (event: any) => {
+        if (event.candidate) {
+          const type = event.candidate.candidateType || 'unknown';
+          const protocol = event.candidate.protocol || 'unknown';
+          console.log('[SIMPLEPEER] ICE candidate:', type, protocol, event.candidate.address);
+        } else {
+          console.log('[SIMPLEPEER] ICE gathering complete');
+        }
       };
     }
   });

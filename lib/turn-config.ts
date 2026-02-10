@@ -38,6 +38,15 @@ const TURN_PROVIDERS: TURNProvider[] = [
   {
     urls: 'stun:stun.cloudflare.com:3478',
     priority: 4
+  },
+  // Additional STUN servers for mobile compatibility
+  {
+    urls: 'stun:stun.miwifi.com:3478',
+    priority: 5
+  },
+  {
+    urls: 'stun:stun.syncthing.net:3478',
+    priority: 6
   }
 ];
 
