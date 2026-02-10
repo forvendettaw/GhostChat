@@ -9,14 +9,14 @@ export const metadata: Metadata = {
   creator: 'Teycir',
   publisher: 'GhostChat',
   manifest: '/manifest.json',
-  metadataBase: new URL('https://ghost-chat.pages.dev'),
+  metadataBase: new URL('https://ghost-chat-bxc.pages.dev'),
   alternates: {
-    canonical: 'https://ghost-chat.pages.dev',
+    canonical: 'https://ghost-chat-bxc.pages.dev',
   },
   openGraph: {
     title: 'GhostChat - Secure P2P WebRTC Chat',
     description: 'Free peer-to-peer chat with WebRTC. No servers, no storage, no accounts. Messages vanish when you close the tab.',
-    url: 'https://ghost-chat.pages.dev',
+    url: 'https://ghost-chat-bxc.pages.dev',
     siteName: 'GhostChat',
     locale: 'en_US',
     type: 'website',

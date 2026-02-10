@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ghost-chat.pages.dev/sitemap.xml
+Sitemap: https://ghost-chat-bxc.pages.dev/sitemap.xml
