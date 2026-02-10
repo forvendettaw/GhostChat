@@ -9,6 +9,7 @@ let remotePeerId: string | null = null;
 let storedOnMessage: ((peerId: string, data: string) => void) | null = null;
 let storedOnConnect: ((remotePeerId?: string) => void) | null = null;
 let storedOnDisconnect: ((reason?: string) => void) | undefined = undefined;
+let p2pEstablished = false; // 跟踪P2P连接是否真正建立过
 
 async function tryConnectWorker(
   workerUrl: string,
@@ -77,17 +78,20 @@ async function tryConnectWorker(
     };
 
     ws.onclose = () => {
-      console.log('[SIMPLEPEER] WebSocket closed');
+      console.log('[SIMPLEPEER] WebSocket closed, p2pEstablished:', p2pEstablished);
       // 只有在 P2P 连接已建立的情况下才调用 disconnect
       // 如果只是 WebSocket 关闭但 P2P 还没连接，不要触发 disconnect
-      if (peer && peer.connected) {
-        peer.destroy();
+      if (p2pEstablished) {
+        console.log('[SIMPLEPEER] P2P was established, calling disconnect');
+        if (peer) peer.destroy();
         if (storedOnDisconnect) storedOnDisconnect('peer-left');
       } else if (peer) {
-        // 如果 peer 存在但未连接，说明连接尝试失败了
+        // 如果 peer 存在但 P2P 未建立，说明连接尝试失败了
         console.error('[SIMPLEPEER] WebSocket closed before P2P connection established');
         peer.destroy();
         if (storedOnDisconnect) storedOnDisconnect('connection-failed');
+      } else {
+        console.log('[SIMPLEPEER] WebSocket closed but no peer created yet, ignoring');
       }
     };
 
@@ -168,6 +172,7 @@ function setupPeer(
 
   p.on('connect', () => {
     console.log('[SIMPLEPEER] P2P connected successfully');
+    p2pEstablished = true; // 标记P2P连接已建立
     if (iceTimeout) clearTimeout(iceTimeout);
     if (connectionTimeout) clearTimeout(connectionTimeout);
     onConnect(targetPeerId || remotePeerId || undefined);
@@ -288,4 +293,5 @@ export function destroySimplePeer() {
   storedOnMessage = null;
   storedOnConnect = null;
   storedOnDisconnect = undefined;
+  p2pEstablished = false; // 重置P2P连接标志
 }
