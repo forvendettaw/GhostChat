@@ -11,24 +11,8 @@ export async function initPeer(
   onDisconnect?: (reason?: string) => void,
   onFallback?: () => void
 ): Promise<string | null> {
-  // 检测移动端，直接使用 PeerJS
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  console.log('[PROTOCOL] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
-
-  if (isMobile) {
-    console.log('[PROTOCOL] Mobile detected, using PeerJS directly...');
-    try {
-      const id = await PeerJSProtocol.initPeerJS(onMessage, onConnect, onDisconnect);
-      currentProtocol = 'peerjs';
-      console.log('[PROTOCOL] Using PeerJS (mobile)');
-      return id;
-    } catch (err) {
-      console.error('[PROTOCOL] PeerJS failed on mobile:', err);
-      throw err;
-    }
-  }
-
-  // PC 端优先使用 SimplePeer，失败后回退到 PeerJS
+  // 所有设备都优先尝试 SimplePeer + Cloudflare Worker
+  // Cloudflare Worker 是我们自己的服务器，比公共 PeerJS 更可靠
   try {
     console.log('[PROTOCOL] Trying simple-peer + Cloudflare Worker...');
     const id = await SimplePeerProtocol.initSimplePeer(onMessage, onConnect, onDisconnect);
