@@ -6,6 +6,10 @@ export function getConnectionErrorMessage(error: any): string {
   }
 
   if (errorType === "peer-unavailable") {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      return "无法连接到对方。移动端连接可能需要更长时间（最多 45 秒）。请确保双方都在稳定的 WiFi 网络下。如果仍失败，请复制最新链接重试。";
+    }
     return "Peer not found. They may have closed their tab. Ask them to create a new invite link.";
   }
 
@@ -26,11 +30,23 @@ export function getConnectionErrorMessage(error: any): string {
   }
 
   if (errorType === "network-error") {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      return "移动端网络连接中断。请检查网络连接，建议使用 WiFi 而非移动数据。";
+    }
     return "Network connection lost. Check your internet or try reconnecting.";
   }
 
   if (errorType === "disconnected") {
     return "Connection lost. Peer may have closed their tab or lost internet.";
+  }
+
+  if (errorType === "connection-timeout") {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      return "连接超时。移动端可能需要更长时间。建议：1) 双方都使用 WiFi；2) 关闭 VPN；3) 刷新页面重试。";
+    }
+    return "Connection timeout. Please check your network and try again.";
   }
 
   return "Connection failed. Check Diagnostics for details.";

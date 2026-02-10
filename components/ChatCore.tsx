@@ -114,6 +114,25 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
     initialized.current = true;
 
     (async () => {
+      // WebRTC 能力检测
+      const isWebRTCSupported = () => {
+        const w = window as any;
+        return !!(w.RTCPeerConnection || w.webkitRTCPeerConnection || w.mozRTCPeerConnection || w.RTCIceGatherer);
+      };
+
+      console.log('[WebRTC] Browser Support Check:');
+      console.log('[WebRTC] - RTCPeerConnection:', !!(window as any).RTCPeerConnection);
+      console.log('[WebRTC] - getUserMedia:', !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+      console.log('[WebRTC] - WebSocket:', !!window.WebSocket);
+      console.log('[WebRTC] - User Agent:', navigator.userAgent);
+      console.log('[WebRTC] - Platform:', navigator.platform);
+      console.log('[WebRTC] - Supported:', isWebRTCSupported());
+
+      if (!isWebRTCSupported()) {
+        setError('您的浏览器不支持 WebRTC。请使用 Chrome、Firefox、Safari 或 Edge 最新版本。');
+        return;
+      }
+
       if (checkIsMobile()) {
         ensureHTTPS();
         requestWakeLock();

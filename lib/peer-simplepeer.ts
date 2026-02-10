@@ -123,9 +123,14 @@ function setupPeer(
   targetPeerId?: string
 ) {
   let disconnectCalled = false;
+  let iceTimeout: NodeJS.Timeout | null = null;
+  let connectionTimeout: NodeJS.Timeout | null = null;
+
   const callDisconnect = (reason: string) => {
     if (!disconnectCalled && onDisconnect) {
       disconnectCalled = true;
+      if (iceTimeout) clearTimeout(iceTimeout);
+      if (connectionTimeout) clearTimeout(connectionTimeout);
       onDisconnect(reason);
     }
   };
@@ -145,6 +150,8 @@ function setupPeer(
 
   p.on('connect', () => {
     console.log('[SIMPLEPEER] P2P connected successfully');
+    if (iceTimeout) clearTimeout(iceTimeout);
+    if (connectionTimeout) clearTimeout(connectionTimeout);
     onConnect(targetPeerId || remotePeerId || undefined);
 
     const pc = (p as any)._pc;
@@ -185,6 +192,17 @@ function setupPeer(
       callDisconnect('network-error');
     }
   });
+
+  // 设置 ICE 连接超时（移动端需要更长时间）
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const timeoutMs = isMobile ? 45000 : 30000; // 移动端 45 秒，桌面 30 秒
+
+  connectionTimeout = setTimeout(() => {
+    if (!p.connected) {
+      console.error('[SIMPLEPEER] Connection timeout after', timeoutMs / 1000, 'seconds');
+      callDisconnect('connection-timeout');
+    }
+  }, timeoutMs);
 }
 
 export function connectSimplePeer(
