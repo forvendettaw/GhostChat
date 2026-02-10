@@ -19,10 +19,10 @@ async function tryConnectWorker(
   storedOnMessage = onMessage;
   storedOnConnect = onConnect;
   storedOnDisconnect = onDisconnect;
-  
+
   return new Promise((resolve, reject) => {
     myId = Math.random().toString(36).substr(2, 9);
-    
+
     console.log('[SIMPLEPEER] Trying worker:', workerUrl);
     ws = new WebSocket(`${workerUrl}?key=peerjs&id=${myId}&token=token`);
     
@@ -52,8 +52,8 @@ async function tryConnectWorker(
             initiator: false,
             config: {
               iceServers: getTURNServers(),
-              // 移动端优先使用中继，改善连接成功率
-              iceTransportPolicy: isMobile ? 'relay' : 'all'
+              // 强制使用中继，改善 VPN 和移动端的连接成功率
+              iceTransportPolicy: 'relay'
             }
           });
 
@@ -239,8 +239,8 @@ export function connectSimplePeer(
     initiator: true,
     config: {
       iceServers: getTURNServers(),
-      // 移动端优先使用中继，改善连接成功率
-      iceTransportPolicy: isMobile ? 'relay' : 'all'
+      // 强制使用中继，改善 VPN 和移动端的连接成功率
+      iceTransportPolicy: 'relay'
     }
   });
 
