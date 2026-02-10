@@ -138,13 +138,17 @@ function setupPeer(
   p.on('signal', (signal) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       const dst = targetPeerId || remotePeerId || 'unknown';
-      console.log('[SIMPLEPEER] Sending signal to:', dst, signal.type || 'candidate');
-      ws.send(JSON.stringify({
+      console.log('[SIMPLEPEER] Sending signal to:', dst, 'type:', signal.type || 'candidate', 'myId:', myId);
+      const message = JSON.stringify({
         type: 'SIGNAL',
         src: myId,
         dst,
         signal
-      }));
+      });
+      console.log('[SIMPLEPEER] Message payload:', message);
+      ws.send(message);
+    } else {
+      console.error('[SIMPLEPEER] Cannot send signal - WebSocket not ready. State:', ws?.readyState);
     }
   });
 
