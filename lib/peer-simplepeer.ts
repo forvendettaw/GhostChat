@@ -10,6 +10,42 @@ let storedOnMessage: ((peerId: string, data: string) => void) | null = null;
 let storedOnConnect: ((remotePeerId?: string) => void) | null = null;
 let storedOnDisconnect: ((reason?: string) => void) | undefined = undefined;
 let p2pEstablished = false; // 跟踪P2P连接是否真正建立过
+let heartbeatInterval: NodeJS.Timeout | null = null; // 心跳定时器
+
+// 启动 WebSocket 心跳，保持连接活跃
+function startHeartbeat() {
+  stopHeartbeat(); // 先清除之前的心跳
+
+  // 移动端使用更短的心跳间隔（15秒），桌面端使用 20 秒
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const interval = isMobile ? 15000 : 20000;
+
+  console.log('[SIMPLEPEER] Starting heartbeat (interval:', interval / 1000, 's)');
+
+  heartbeatInterval = setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(JSON.stringify({ type: 'PING' }));
+        console.log('[SIMPLEPEER] Sent PING to server');
+      } catch (err) {
+        console.error('[SIMPLEPEER] Error sending PING:', err);
+        stopHeartbeat();
+      }
+    } else {
+      console.log('[SIMPLEPEER] WebSocket not open, stopping heartbeat');
+      stopHeartbeat();
+    }
+  }, interval);
+}
+
+// 停止心跳
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+    console.log('[SIMPLEPEER] Heartbeat stopped');
+  }
+}
 
 async function tryConnectWorker(
   workerUrl: string,
@@ -31,7 +67,7 @@ async function tryConnectWorker(
       console.log('[SIMPLEPEER] WebSocket connected, ID:', myId);
       resolve(myId);
     };
-    
+
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
@@ -39,6 +75,22 @@ async function tryConnectWorker(
 
         if (msg.type === 'OPEN') {
           console.log('[SIMPLEPEER] Server acknowledged');
+          // 立即发送第一个 PING，保持 WebSocket 连接活跃
+          try {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'PING' }));
+              console.log('[SIMPLEPEER] Sent initial PING immediately');
+            }
+          } catch (err) {
+            console.error('[SIMPLEPEER] Error sending initial PING:', err);
+          }
+          // 启动定期心跳
+          startHeartbeat();
+          return;
+        }
+
+        if (msg.type === 'PONG') {
+          console.log('[SIMPLEPEER] Received PONG from server');
           return;
         }
 
@@ -79,6 +131,7 @@ async function tryConnectWorker(
 
     ws.onclose = () => {
       console.log('[SIMPLEPEER] WebSocket closed, p2pEstablished:', p2pEstablished);
+      stopHeartbeat(); // 停止心跳
       // 只有在 P2P 连接已建立的情况下才调用 disconnect
       // 如果只是 WebSocket 关闭但 P2P 还没连接，不要触发 disconnect
       if (p2pEstablished) {
@@ -284,6 +337,7 @@ export function sendSimplePeer(data: string) {
 }
 
 export function destroySimplePeer() {
+  stopHeartbeat(); // 停止心跳
   peer?.destroy();
   ws?.close();
   peer = null;

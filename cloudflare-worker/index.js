@@ -52,6 +52,17 @@ export class PeerSession {
 
       console.log('[WORKER] Received message:', data.type, 'from:', data.src, 'to:', data.dst);
 
+      // 处理心跳 PING 消息，立即回复 PONG
+      if (data.type === 'PING') {
+        console.log('[WORKER] Received PING, sending PONG');
+        try {
+          ws.send(JSON.stringify({ type: 'PONG' }));
+        } catch (err) {
+          console.error('[WORKER] Error sending PONG:', err);
+        }
+        return;
+      }
+
       if (data.dst) {
         const sockets = this.state.getWebSockets();
         console.log('[WORKER] Active sockets:', sockets.length);
