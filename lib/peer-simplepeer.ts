@@ -44,18 +44,18 @@ async function tryConnectWorker(
           console.log('[SIMPLEPEER] Incoming connection from:', msg.src);
           remotePeerId = msg.src;
 
-          // 移动端需要更长的 ICE 收集超时时间
+          // 移动端检测和配置
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          console.log('[SIMPLEPEER] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
 
           peer = new SimplePeer({
             initiator: false,
             config: {
               iceServers: getTURNServers(),
-              iceTransportPolicy: 'all',
-              // 移动端需要更长的 ICE 收集时间
-              iceCandidatePoolSize: isMobile ? 10 : 4
+              // 移动端优先使用中继，改善连接成功率
+              iceTransportPolicy: isMobile ? 'relay' : 'all'
             }
-          } as any);
+          });
 
           setupPeer(peer, storedOnMessage!, storedOnConnect!, storedOnDisconnect, msg.src);
         }
@@ -129,10 +129,11 @@ function setupPeer(
       onDisconnect(reason);
     }
   };
+
   p.on('signal', (signal) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       const dst = targetPeerId || remotePeerId || 'unknown';
-      console.log('[SIMPLEPEER] Sending signal to:', dst);
+      console.log('[SIMPLEPEER] Sending signal to:', dst, signal.type || 'candidate');
       ws.send(JSON.stringify({
         type: 'SIGNAL',
         src: myId,
@@ -141,31 +142,40 @@ function setupPeer(
       }));
     }
   });
-  
+
   p.on('connect', () => {
-    console.log('[SIMPLEPEER] P2P connected');
+    console.log('[SIMPLEPEER] P2P connected successfully');
     onConnect(targetPeerId || remotePeerId || undefined);
-    
+
     const pc = (p as any)._pc;
     if (pc) {
       pc.oniceconnectionstatechange = () => {
+        console.log('[SIMPLEPEER] ICE connection state:', pc.iceConnectionState);
         if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
-          console.log('[SIMPLEPEER] ICE state:', pc.iceConnectionState);
+          console.error('[SIMPLEPEER] ICE failed or disconnected');
           callDisconnect('peer-left');
         }
       };
+
+      pc.onicegatheringstatechange = () => {
+        console.log('[SIMPLEPEER] ICE gathering state:', pc.iceGatheringState);
+      };
+
+      pc.onconnectionstatechange = () => {
+        console.log('[SIMPLEPEER] Connection state:', pc.connectionState);
+      };
     }
   });
-  
+
   p.on('data', (data) => {
     onMessage('remote', data.toString());
   });
-  
+
   p.on('close', () => {
     console.log('[SIMPLEPEER] P2P closed gracefully');
     callDisconnect('peer-left');
   });
-  
+
   p.on('error', (err) => {
     console.error('[SIMPLEPEER] P2P error:', err);
     const errMsg = err?.message || err?.toString() || '';
@@ -186,18 +196,18 @@ export function connectSimplePeer(
   console.log('[SIMPLEPEER] Connecting to:', targetPeerId);
   remotePeerId = targetPeerId;
 
-  // 移动端需要更长的 ICE 收集超时时间
+  // 移动端检测和配置
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  console.log('[SIMPLEPEER] Device type:', isMobile ? 'MOBILE' : 'DESKTOP');
 
   peer = new SimplePeer({
     initiator: true,
     config: {
       iceServers: getTURNServers(),
-      iceTransportPolicy: 'all',
-      // 移动端需要更长的 ICE 收集时间
-      iceCandidatePoolSize: isMobile ? 10 : 4
+      // 移动端优先使用中继，改善连接成功率
+      iceTransportPolicy: isMobile ? 'relay' : 'all'
     }
-  } as any);
+  });
 
   setupPeer(peer, onMessage, onConnect, onDisconnect, targetPeerId);
 }
