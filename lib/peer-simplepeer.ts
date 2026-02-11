@@ -11,6 +11,9 @@ let storedOnConnect: ((remotePeerId?: string) => void) | null = null;
 let storedOnDisconnect: ((reason?: string) => void) | undefined = undefined;
 let p2pEstablished = false; // 跟踪P2P连接是否真正建立过
 let heartbeatInterval: NodeJS.Timeout | null = null; // 心跳定时器
+let reconnectAttempts = 0; // 重连尝试次数
+let maxReconnectAttempts = 3; // 最大重连次数
+let currentWorkerUrl = ''; // 当前 worker URL
 
 // 启动 WebSocket 心跳，保持连接活跃
 function startHeartbeat() {
@@ -56,6 +59,7 @@ async function tryConnectWorker(
   storedOnMessage = onMessage;
   storedOnConnect = onConnect;
   storedOnDisconnect = onDisconnect;
+  currentWorkerUrl = workerUrl;
 
   return new Promise((resolve, reject) => {
     myId = Math.random().toString(36).substr(2, 9);
@@ -125,13 +129,30 @@ async function tryConnectWorker(
     };
     
     ws.onerror = (err) => {
-      console.error('[SIMPLEPEER] WebSocket error:', err);
+      // 详细的错误日志
+      const event = err as Event;
+      console.error('[SIMPLEPEER] WebSocket error:', {
+        type: event.type,
+        target: (event.target as WebSocket)?.url,
+        readyState: (event.target as WebSocket)?.readyState,
+        bufferedAmount: (event.target as WebSocket)?.bufferedAmount
+      });
+      // 移动端常见问题：网络切换导致 WebSocket 关闭
+      console.error('[SIMPLEPEER] Error details - 可能是移动端网络切换导致的连接断开');
       reject(err);
     };
 
-    ws.onclose = () => {
-      console.log('[SIMPLEPEER] WebSocket closed, p2pEstablished:', p2pEstablished);
+    ws.onclose = (event) => {
+      console.log('[SIMPLEPEER] WebSocket closed:', {
+        code: event.code,
+        reason: event.reason || 'none',
+        wasClean: event.wasClean,
+        p2pEstablished,
+        peerExists: !!peer,
+        peerConnected: peer?.connected || false
+      });
       stopHeartbeat(); // 停止心跳
+
       // 只有在 P2P 连接已建立的情况下才调用 disconnect
       // 如果只是 WebSocket 关闭但 P2P 还没连接，不要触发 disconnect
       if (p2pEstablished) {
@@ -144,7 +165,30 @@ async function tryConnectWorker(
         peer.destroy();
         if (storedOnDisconnect) storedOnDisconnect('connection-failed');
       } else {
-        console.log('[SIMPLEPEER] WebSocket closed but no peer created yet, ignoring');
+        // 移动端自动重连：如果 WebSocket 关闭但 P2P 未建立，尝试重连
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile && reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          console.log(`[SIMPLEPEER] 移动端自动重连 (${reconnectAttempts}/${maxReconnectAttempts})...`);
+
+          // 延迟后重连
+          setTimeout(async () => {
+            try {
+              console.log('[SIMPLEPEER] 尝试重新连接...');
+              const newId = await tryConnectWorker(currentWorkerUrl, storedOnMessage!, storedOnConnect!, storedOnDisconnect);
+              if (newId) {
+                console.log('[SIMPLEPEER] 重连成功!');
+                reconnectAttempts = 0; // 重置重连计数
+              }
+            } catch (err) {
+              console.error('[SIMPLEPEER] 重连失败:', err);
+            }
+          }, 2000); // 2秒后重连
+        } else if (!isMobile) {
+          console.log('[SIMPLEPEER] WebSocket closed but no peer created yet (desktop)');
+        } else {
+          console.error('[SIMPLEPEER] 移动端重连已达最大次数，放弃重连');
+        }
       }
     };
 
@@ -165,9 +209,10 @@ export async function initSimplePeer(
   onDisconnect?: (reason?: string) => void
 ): Promise<string | null> {
   resetWorkerPool();
-  
+  reconnectAttempts = 0; // 重置重连计数
+
   let currentWorker = getCurrentWorker();
-  
+
   while (currentWorker) {
     try {
       const id = await tryConnectWorker(currentWorker, onMessage, onConnect, onDisconnect);
@@ -348,4 +393,6 @@ export function destroySimplePeer() {
   storedOnConnect = null;
   storedOnDisconnect = undefined;
   p2pEstablished = false; // 重置P2P连接标志
+  reconnectAttempts = 0; // 重置重连计数
+  currentWorkerUrl = ''; // 清空 worker URL
 }

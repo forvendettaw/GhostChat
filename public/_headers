@@ -4,3 +4,6 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cache-Control: no-cache, no-store, must-revalidate
+/_next/static/chunks/*
+  Cache-Control: public, max-age=0, must-revalidate
