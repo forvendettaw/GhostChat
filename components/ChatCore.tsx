@@ -98,6 +98,7 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [isMobileView, setIsMobileView] = useState(false);
   const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
 
   const initialized = React.useRef(false);
   const peerConnection = React.useRef<any>(null);
@@ -301,8 +302,9 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
           );
 
           // 移动端需要更长的连接超时时间
+          // 注意：必须与 peer-simplepeer.ts:562 中的超时一致（120秒）
           const isMobile = checkIsMobile();
-          const connectionTimeoutMs = isMobile ? 90000 : 45000;
+          const connectionTimeoutMs = isMobile ? 125000 : 50000; // 比 peer-simplepeer 多5秒缓冲
 
           connectionTimeout.current = setTimeout(() => {
             if (!connected) {
@@ -516,9 +518,38 @@ export default function ChatCore({ invitePeerId }: ChatCoreProps) {
   const isMobile = screenWidth < 768;
   const isSmallMobile = screenWidth < 480;
 
+  // 获取调试信息
+  const getDebugMessages = () => {
+    if (typeof window !== 'undefined' && (window as any).getDebugInfo) {
+      return (window as any).getDebugInfo();
+    }
+    return [];
+  };
+
   return (
     <div style={{ height: "100vh", width: "100%", maxWidth: "1400px", margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <ErrorHandler error={error} />
+
+      {/* 调试信息面板 - 仅在未连接时显示 */}
+      {!connected && !hasConnected && getDebugMessages().length > 0 && (
+        <div style={{
+          padding: isSmallMobile ? 8 : 12,
+          background: "#1a1a2e",
+          color: "#0f0",
+          fontSize: isSmallMobile ? 9 : 10,
+          fontFamily: "monospace",
+          borderBottom: "1px solid #0f0",
+          maxHeight: "200px",
+          overflow: "auto"
+        }}>
+          <div style={{ marginBottom: 8, fontWeight: "bold", color: "#ff0" }}>
+            🔍 连接诊断信息:
+          </div>
+          {getDebugMessages().map((msg: string, i: number) => (
+            <div key={i} style={{ padding: "2px 0" }}>{msg}</div>
+          ))}
+        </div>
+      )}
       {fallbackWarning && (
         <div
           style={{

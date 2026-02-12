@@ -8,6 +8,10 @@ export class PeerSession {
   constructor(state) {
     this.state = state;
     this.sessions = new Map();
+    // 存储每个客户端的最后活跃时间
+    this.lastActivity = new Map();
+    // 心跳检查间隔（30秒）
+    this.heartbeatInterval = 30000;
   }
 
   async fetch(request) {
@@ -30,6 +34,9 @@ export class PeerSession {
       this.state.acceptWebSocket(server, [id]);
       console.log('[WORKER] WebSocket accepted for ID:', id);
 
+      // 记录初始活跃时间
+      this.lastActivity.set(id, Date.now());
+
       // Send acknowledgment after a short delay to ensure WebSocket is ready
       setTimeout(() => {
         try {
@@ -39,6 +46,28 @@ export class PeerSession {
           console.error('[WORKER] Error sending OPEN:', err);
         }
       }, 100);
+
+      // 定期检查心跳，清理不活跃的连接
+      const heartbeatCheck = setInterval(() => {
+        const now = Date.now();
+        const lastSeen = this.lastActivity.get(id) || 0;
+        const inactiveTime = now - lastSeen;
+
+        if (inactiveTime > this.heartbeatInterval * 2) {
+          // 超过 60 秒没有心跳，关闭连接
+          console.warn(`[WORKER] Client ${id} inactive for ${inactiveTime}ms, closing connection`);
+          try {
+            server.close(1000, 'Heartbeat timeout');
+          } catch (e) {
+            // 连接可能已经关闭
+          }
+          clearInterval(heartbeatCheck);
+          this.lastActivity.delete(id);
+        }
+      }, this.heartbeatInterval);
+
+      // 保存定时器引用，以便连接关闭时清理
+      server._heartbeatCheck = heartbeatCheck;
 
       return new Response(null, { status: 101, webSocket: client });
     }
@@ -50,11 +79,18 @@ export class PeerSession {
     try {
       const data = JSON.parse(message);
 
+      // 更新活跃时间
+      const tags = this.state.getTags(ws);
+      const peerId = tags ? tags[0] : null;
+      if (peerId) {
+        this.lastActivity.set(peerId, Date.now());
+      }
+
       console.log('[WORKER] Received message:', data.type, 'from:', data.src, 'to:', data.dst);
 
       // 处理心跳 PING 消息，立即回复 PONG
       if (data.type === 'PING') {
-        console.log('[WORKER] Received PING, sending PONG');
+        console.log('[WORKER] Received PING from', peerId, ', sending PONG');
         try {
           ws.send(JSON.stringify({ type: 'PONG' }));
         } catch (err) {
@@ -98,6 +134,12 @@ export class PeerSession {
     const peerId = tags ? tags[0] : 'unknown';
     console.log('[WORKER] WebSocket closed for ID:', peerId, 'reason:', reason);
 
+    // 清理心跳定时器
+    if (ws._heartbeatCheck) {
+      clearInterval(ws._heartbeatCheck);
+    }
+    this.lastActivity.delete(peerId);
+
     // Log remaining active peers
     const remainingSockets = this.state.getWebSockets();
     console.log('[WORKER] Remaining active peers:', remainingSockets.length);
@@ -107,6 +149,19 @@ export class PeerSession {
         return t ? t[0] : 'unknown';
       }).join(', '));
     }
+  }
+
+  async webSocketError(ws, error) {
+    const tags = this.state.getTags(ws);
+    const peerId = tags ? tags[0] : 'unknown';
+    console.error('[WORKER] WebSocket error for ID:', peerId);
+    console.error('[WORKER] Error:', error);
+
+    // 清理心跳定时器
+    if (ws._heartbeatCheck) {
+      clearInterval(ws._heartbeatCheck);
+    }
+    this.lastActivity.delete(peerId);
   }
 }
 

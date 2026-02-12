@@ -1,3 +1,6 @@
+import { getTURNServers } from './turn-config';
+import { testAllTURNServers } from './turn-test';
+
 interface DiagnosticResult {
   test: string;
   status: 'pass' | 'fail' | 'warning';
@@ -10,6 +13,24 @@ export async function runNetworkDiagnostics(): Promise<DiagnosticResult[]> {
   results.push(await testWebRTCSupport());
   results.push(await testSTUNConnectivity());
   results.push(await testNetworkType());
+
+  // 测试 TURN 服务器
+  const turnResults = await testAllTURNServers(getTURNServers());
+  const reachableCount = turnResults.filter(r => r.reachable).length;
+
+  if (reachableCount > 0) {
+    results.push({
+      test: 'TURN Servers',
+      status: 'pass',
+      message: `${reachableCount}/${turnResults.length} TURN servers reachable`
+    });
+  } else {
+    results.push({
+      test: 'TURN Servers',
+      status: 'fail',
+      message: `None of the ${turnResults.length} TURN servers are reachable - VPN or firewall may be blocking`
+    });
+  }
 
   return results;
 }

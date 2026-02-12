@@ -8,7 +8,7 @@ export function getConnectionErrorMessage(error: any): string {
   if (errorType === "peer-unavailable") {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      return "无法连接到对方。移动端连接可能需要更长时间（最多 45 秒）。请确保双方都在稳定的 WiFi 网络下。如果仍失败，请复制最新链接重试。";
+      return "无法连接到对方。移动端连接可能需要更长时间（最多 2 分钟）。请确保双方都在稳定的 WiFi 网络下，关闭至少一方的 VPN。如果仍失败，请复制最新链接重试。";
     }
     return "Peer not found. They may have closed their tab. Ask them to create a new invite link.";
   }
@@ -44,15 +44,15 @@ export function getConnectionErrorMessage(error: any): string {
   if (errorType === "connection-timeout") {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      return "连接超时。移动端可能需要更长时间。建议：1) 双方都使用 WiFi；2) 如果使用 VPN 请尝试关闭；3) 刷新页面重试。";
+      return "连接超时（已等待 2 分钟）。\n\n移动端 + VPN 环境可能需要更长时间。\n\n建议操作：\n1. 🔄 刷新页面重试\n2. 📱 关闭至少一台手机的 VPN\n3. 🌐 使用 WiFi 而非移动数据\n4. ⏳ 给连接更多时间（最多 2 分钟）";
     }
-    return "Connection timeout. If using VPN, try disabling it and reconnect.";
+    return "Connection timeout (waited 2 minutes).\n\nMobile + VPN may need more time.\n\nSuggestions:\n1. 🔄 Refresh page\n2. 📱 Disable VPN on at least one phone\n3. 🌐 Try WiFi instead of mobile data\n4. ⏳ Be patient (up to 2 minutes)";
   }
 
   if (errorType === "connection-failed") {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
-      return "连接失败。请确保：1) 双方都在同一页面；2) 网络连接稳定；3) 尝试刷新页面重新生成邀请链接。";
+      return "P2P 连接失败。\n\n可能原因：\n• 双方 VPN 阻止了 TURN 连接\n• 防火墙阻止了 UDP/TCP 端口\n• 网络不稳定导致连接中断\n\n解决方案：\n1. 📱 关闭至少一台手机的 VPN\n2. 🌐 使用稳定的 WiFi 网络\n3. 🔄 刷新页面后重试\n4. ⏳ 给连接 2 分钟时间";
     }
     return "Connection failed. Please make sure both parties are on the same page and try refreshing.";
   }
