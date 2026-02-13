@@ -565,7 +565,8 @@ function setupPeer(
   // 设置 ICE 连接超时（移动端需要更长时间）
   // GitHub 研究显示移动端 + VPN 需要 60-120 秒才能完成 ICE 收集
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const timeoutMs = isMobile ? 120000 : 90000; // 移动端 120 秒，桌面 90 秒
+  // 增加超时到 2 分钟，给 ICE 更多时间
+  const timeoutMs = isMobile ? 180000 : 120000; // 移动端 3 分钟，桌面 2 分钟
   addDebug(`⏱️ 连接超时设置: ${timeoutMs / 1000} 秒 (移动端: ${isMobile})`);
 
   connectionTimeout = setTimeout(() => {
