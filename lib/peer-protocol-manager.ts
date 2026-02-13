@@ -11,22 +11,22 @@ export async function initPeer(
   onDisconnect?: (reason?: string) => void,
   onFallback?: () => void
 ): Promise<string | null> {
-  // 所有设备都优先尝试 SimplePeer + Cloudflare Worker
-  // Cloudflare Worker 是我们自己的服务器，比公共 PeerJS 更可靠
+  // 优先尝试 PeerJS（有自己的 TURN 服务器，更可靠）
   try {
-    console.log('[PROTOCOL] Trying simple-peer + Cloudflare Worker...');
-    const id = await SimplePeerProtocol.initSimplePeer(onMessage, onConnect, onDisconnect);
-    currentProtocol = 'simplepeer';
-    console.log('[PROTOCOL] Using simple-peer');
+    console.log('[PROTOCOL] Trying PeerJS...');
+    const id = await PeerJSProtocol.initPeerJS(onMessage, onConnect, onDisconnect);
+    currentProtocol = 'peerjs';
+    console.log('[PROTOCOL] Using PeerJS');
     return id;
   } catch (err) {
-    console.warn('[PROTOCOL] simple-peer failed:', err);
-    console.log('[PROTOCOL] Falling back to PeerJS...');
-
+    console.warn('[PROTOCOL] PeerJS failed:', err);
+    
+    // 回退到 SimplePeer + Cloudflare Worker
+    console.log('[PROTOCOL] Falling back to simple-peer...');
     try {
-      const id = await PeerJSProtocol.initPeerJS(onMessage, onConnect, onDisconnect);
-      currentProtocol = 'peerjs';
-      console.log('[PROTOCOL] Using PeerJS (fallback)');
+      const id = await SimplePeerProtocol.initSimplePeer(onMessage, onConnect, onDisconnect);
+      currentProtocol = 'simplepeer';
+      console.log('[PROTOCOL] Using simple-peer');
       if (onFallback) onFallback();
       return id;
     } catch (fallbackErr) {
