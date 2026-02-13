@@ -1,6 +1,6 @@
 import SimplePeer from 'simple-peer';
 import { getTURNServers } from './turn-config';
-import { getCurrentWorker, getNextWorker, resetWorkerPool } from './cloudflare-workers-pool';
+import { getCurrentWorker, getNextWorker, resetWorkerPool, markWorkerFailed } from './cloudflare-workers-pool';
 
 let ws: WebSocket | null = null;
 let myId: string | null = null;
@@ -312,6 +312,8 @@ export async function initSimplePeer(
       return id;
     } catch (err) {
       console.warn('[SIMPLEPEER] Worker failed:', currentWorker, err);
+      // 标记当前 worker 为失败
+      markWorkerFailed();
       const nextWorker = getNextWorker();
       if (!nextWorker) {
         throw new Error('All Cloudflare Workers failed');
