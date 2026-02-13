@@ -8,7 +8,7 @@
  */
 
 export const CLOUDFLARE_WORKERS = [
-  // 主服务器（最可靠）
+  // 主服务器（最可靠）- 已部署
   'wss://ghostchat-signaling.forvendettaw.workers.dev/peerjs/peerjs',
 
   // 备用服务器（故障转移用）

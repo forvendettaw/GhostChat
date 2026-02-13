@@ -52,7 +52,7 @@ class OptimizedFileTransfer {
     let optimalChunkSize = 64 * 1024;
 
     // 根据延迟调整
-    if (networkLatency !== null) {
+    if (networkLatency !== null && networkLatency !== undefined) {
       if (networkLatency < 100) {
         // 低延迟：使用更大的分块以提高吞吐量
         optimalChunkSize = 128 * 1024;
@@ -63,7 +63,7 @@ class OptimizedFileTransfer {
     }
 
     // 根据带宽调整
-    if (networkBandwidth !== null && networkBandwidth < 500) {
+    if (networkBandwidth !== null && networkBandwidth !== undefined && networkBandwidth < 500) {
       // 低带宽：使用更小的分块
       optimalChunkSize = 32 * 1024;
     }
@@ -93,7 +93,7 @@ class OptimizedFileTransfer {
     const fileName = file.name;
 
     // 计算分块大小
-    const finalChunkSize = customChunkSize || chunkSize;
+    const finalChunkSize = customChunkSize || this.chunkSize;
     const totalChunks = Math.ceil(fileSize / finalChunkSize);
 
     console.log(`[FILE-TRANSFER] Chunking ${fileName} (${this.formatFileSize(fileSize)}) into ${totalChunks} chunks`);

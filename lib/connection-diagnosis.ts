@@ -87,7 +87,7 @@ export function runDiagnostics(stats: Partial<ConnectionStats>): DiagnosticResul
   }
 
   // 延迟检查
-  if (stats.latency !== null) {
+  if (stats.latency !== null && stats.latency !== undefined) {
     if (stats.latency > 1000) {
       results.push({
         category: 'warning',

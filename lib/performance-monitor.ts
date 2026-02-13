@@ -40,23 +40,23 @@ class PerformanceMonitor {
     let score = 100;
 
     // 延迟扣分
-    if (metrics.latency !== null) {
+    if (metrics.latency !== null && metrics.latency !== undefined) {
       if (metrics.latency > 500) score -= 30;
       else if (metrics.latency > 300) score -= 20;
       else if (metrics.latency > 150) score -= 10;
     }
 
     // 丢包扣分
-    if (metrics.packetLoss > 5) score -= 40;
-    else if (metrics.packetLoss > 2) score -= 20;
-    else if (metrics.packetLoss > 1) score -= 10;
+    if (metrics.packetLoss !== undefined && metrics.packetLoss > 5) score -= 40;
+    else if (metrics.packetLoss !== undefined && metrics.packetLoss > 2) score -= 20;
+    else if (metrics.packetLoss !== undefined && metrics.packetLoss > 1) score -= 10;
 
     // 抖动扣分
-    if (metrics.jitter > 100) score -= 20;
-    else if (metrics.jitter > 50) score -= 10;
+    if (metrics.jitter !== undefined && metrics.jitter > 100) score -= 20;
+    else if (metrics.jitter !== undefined && metrics.jitter > 50) score -= 10;
 
     // 带宽评估
-    if (metrics.estimatedBandwidth !== null) {
+    if (metrics.estimatedBandwidth !== null && metrics.estimatedBandwidth !== undefined) {
       if (metrics.estimatedBandwidth < 300) score -= 20;
       else if (metrics.estimatedBandwidth < 500) score -= 10;
     }
@@ -175,10 +175,10 @@ class PerformanceMonitor {
 
       // 信号强度（基于延迟和丢包）
       let signalStrength = 100;
-      if (metrics.latency !== null) {
+      if (metrics.latency !== null && metrics.latency !== undefined) {
         signalStrength -= Math.min(metrics.latency / 10, 50);
       }
-      signalStrength -= metrics.packetLoss * 10;
+      signalStrength -= (metrics.packetLoss || 0) * 10;
       metrics.signalStrength = Math.max(0, Math.min(100, Math.round(signalStrength)));
 
       // 存储指标
@@ -191,10 +191,10 @@ class PerformanceMonitor {
         estimatedBandwidth: metrics.estimatedBandwidth || null,
         uploadSpeed: metrics.uploadSpeed || null,
         downloadSpeed: metrics.downloadSpeed || null,
-        iceConnectionState: metrics.iceConnectionState,
+        iceConnectionState: metrics.iceConnectionState || 'unknown',
         selectedCandidateType: metrics.selectedCandidateType || null,
-        candidatePairState: metrics.candidatePairState,
-        timestamp: metrics.timestamp
+        candidatePairState: metrics.candidatePairState || 'unknown',
+        timestamp: metrics.timestamp || Date.now()
       };
 
       this.metrics.push(fullMetrics);

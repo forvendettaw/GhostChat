@@ -26,12 +26,12 @@ export default function DiagnosticsFooter({
   fallbackWarning,
 }: DiagnosticsFooterProps) {
   const stats = getStats();
-  const worker = getCurrentWorker();
+  const worker = getCurrentWorker() || '';
   const serverName = worker.includes("teycir")
     ? "CF-1"
     : worker.includes("teycitek")
       ? "CF-2"
-      : "PeerJS";
+      : worker ? "CF" : "PeerJS";
 
   return (
     <div

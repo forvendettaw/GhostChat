@@ -398,7 +398,7 @@ export class EmergencyDestroyer {
   /**
    * 注册紧急销毁快捷键（Ctrl+Shift+X）
    */
-  static registerEmergencyShortcut(): void {
+  static registerEmergencyShortcut(): (() => void) | undefined {
     if (typeof document !== 'undefined') {
       const handler = (e: KeyboardEvent) => {
         if (e.ctrlKey && e.shiftKey && e.key === 'X') {
@@ -411,5 +411,6 @@ export class EmergencyDestroyer {
 
       return () => document.removeEventListener('keydown', handler);
     }
+    return undefined;
   }
 }
