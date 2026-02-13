@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebRTC NAT 诊断</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .result { margin: 10px 0; padding: 15px; border-radius: 5px; }
+    .success { background: #d4edda; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+    .info { background: #d1ecf1; border: 1px solid #bee5eb; }
+    .loading { background: #fff3cd; border: 1px solid #ffeaa7; }
+    h2 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <h1>🧪 WebRTC NAT 诊断工具</h1>
+
+  <button onclick="startTest()">开始测试</button>
+
+  <div id="results"></div>
+
+  <script>
+    async function startTest() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="result loading">正在测试...请等待</div>';
+
+      const stunServers = [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ];
+
+      // 测试 1: STUN 服务器可达性
+      let stunResults = [];
+      for (const server of stunServers) {
+        try {
+          const pc = new RTCPeerConnection({ iceServers: [server] });
+          await new Promise((resolve, reject) => {
+            pc.onicecandidate = (e) => {
+              if (e.candidate) {
+                stunResults.push({
+                  server: server.urls,
+                  success: true,
+                  type: e.candidate.type,
+                  address: e.candidate.address
+                });
+                pc.close();
+                resolve();
+              }
+            };
+            pc.onicecandidateerror = () => {
+              stunResults.push({
+                server: server.urls,
+                success: false,
+                error: 'ICE candidate error'
+              });
+              pc.close();
+              resolve();
+            };
+            setTimeout(() => {
+              stunResults.push({
+                server: server.urls,
+                success: false,
+                error: 'Timeout'
+              });
+              pc.close();
+              resolve();
+            }, 5000);
+          });
+        } catch (e) {
+          stunResults.push({
+            server: server.urls,
+            success: false,
+            error: e.message
+          });
+        }
+      }
+
+      // 测试 2: 收集 ICE 候选
+      let iceCandidates = [];
+      try {
+        const pc = new RTCPeerConnection({ iceServers: stunServers });
+        await new Promise((resolve, reject) => {
+          let candidateCount = 0;
+          pc.onicecandidate = (e) => {
+            if (e.candidate) {
+              candidateCount++;
+              iceCandidates.push({
+                type: e.candidate.type,
+                protocol: e.candidate.protocol,
+                address: e.candidate.address,
+                port: e.candidate.port
+              });
+            } else {
+              setTimeout(() => {
+                pc.close();
+                resolve();
+              }, 2000);
+            }
+          };
+          pc.onicecandidateerror = () => {
+            pc.close();
+            resolve();
+          };
+          setTimeout(() => {
+            pc.close();
+            resolve();
+          }, 10000);
+        });
+      } catch (e) {
+        console.error('ICE test failed:', e);
+      }
+
+      // 显示结果
+      let html = '<h2>📊 测试结果</h2>';
+
+      html += '<h3>STUN 服务器测试</h3>';
+      for (const result of stunResults) {
+        const className = result.success ? 'success' : 'error';
+        html += `<div class="result ${className}">
+          <strong>${result.server}</strong><br>
+          状态: ${result.success ? '✅ 可达' : '❌ 不可达'}<br>
+          ${result.address ? `地址: ${result.address}` : ''}
+          ${result.error ? `错误: ${result.error}` : ''}
+        </div>`;
+      }
+
+      html += '<h3>ICE 候选收集</h3>';
+      if (iceCandidates.length === 0) {
+        html += '<div class="result error">未收集到任何 ICE 候选！NAT 可能完全阻止连接。</div>';
+      } else {
+        const candidateTypes = { host: 0, srflx: 0, relay: 0 };
+        for (const c of iceCandidates) {
+          if (candidateTypes[c.type] !== undefined) {
+            candidateTypes[c.type]++;
+          }
+        }
+        html += '<div class="result info">';
+        html += `<strong>总候选数:</strong> ${iceCandidates.length}<br>`;
+        html += `<strong>候选类型:</strong><br>`;
+        html += `- Host (本地): ${candidateTypes.host || 0}<br>`;
+        html += `- Server Reflexive (STUN): ${candidateTypes.srflx || 0}<br>`;
+        html += `- Relay (TURN): ${candidateTypes.relay || 0}<br>`;
+        html += '</div>';
+
+        if (candidateTypes.relay === 0) {
+          html += '<div class="result error">⚠️ 没有 TURN 候选！连接可能失败。</div>';
+        }
+      }
+
+      html += '<h3>建议</h3>';
+      if (iceCandidates.length === 0 || candidateTypes.relay === 0) {
+        html += '<div class="result info">';
+        html += '<strong>TURN 服务器可能无法访问！</strong><br>';
+        html += '请检查：<br>';
+        html += '1. 端口 3478/5349 是否开放<br>';
+        html += '2. 防火墙是否阻止 UDP/TCP<br>';
+        html += '3. TURN 服务器是否正在运行<br>';
+        html += '</div>';
+      } else {
+        html += '<div class="result success">✅ TURN 服务器可达！可以尝试连接 GhostChat。</div>';
+      }
+
+      results.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

@@ -8,21 +8,6 @@ interface TURNProvider {
 
 // 移动端友好配置：优先使用 TCP 和 TLS TURN 服务器
 const TURN_PROVIDERS: TURNProvider[] = [
-  // ===== 最高优先级：自托管/商业 TURN（最可靠） =====
-
-  // 自托管 TURN 服务器（45.8.204.48）- 最高优先级
-  {
-    urls: [
-      'turn:45.8.204.48:3478',
-      'turns:45.8.204.48:5349?transport=tcp',
-      'turn:45.8.204.48:3478?transport=tcp',
-    ],
-    username: 'ghostchat',
-    credential: 'd260e6665ea30c153a739377b2c0a507',
-    priority: 5, // 最高优先级
-    maxBandwidth: 5000 // 5Mbps
-  },
-
   // ===== 高优先级：可靠的 TURN 中继服务器（支持 TCP，VPN 友好） =====
 
   // Metered.ca free TURN
