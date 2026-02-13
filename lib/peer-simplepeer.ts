@@ -191,15 +191,25 @@ async function tryConnectWorker(
 
             const turnServers = getTURNServers();
             console.log('[SIMPLEPEER] Creating peer (initiator: false)');
-            console.log('[SIMPLEPEER] ICE transport policy: all (尝试所有方式)');
+            console.log('[SIMPLEPEER] ICE transport policy:', isMobile ? 'relay (mobile)' : 'all (desktop)');
+            console.log('[SIMPLEPEER] ICE candidate pool size:', isMobile ? 10 : 5);
+            console.log('[SIMPLEPEER] ICE complete timeout:', isMobile ? 60000 : 45000);
             console.log('[SIMPLEPEER] TURN servers:', turnServers.length);
 
             peer = new SimplePeer({
               initiator: false,
+              iceCompleteTimeout: isMobile ? 60000 : 45000,  // 移动端 60 秒超时
               config: {
-                iceServers: turnServers
-                // 移除强制中继，允许尝试所有连接方式
-                // iceTransportPolicy: 'relay'  // 已禁用
+                iceServers: turnServers,
+                iceCandidatePoolSize: isMobile ? 10 : 5,  // 移动端收集更多候选
+                iceTransportPolicy: isMobile ? 'relay' : 'all',  // 移动端强制中继
+                bundlePolicy: 'max-bundle',  // 优化带宽
+                rtcpMuxPolicy: 'require',  // 优化连接
+              },
+              // 移动端优化
+              sdpTransform: (sdp) => {
+                // 移除带宽限制
+                return sdp.replace(/b=AS:\d+/g, '');
               }
             });
 
@@ -602,10 +612,14 @@ export function connectSimplePeer(
 
   const turnServers = getTURNServers();
   addDebug(`📡 创建 P2P 连接 (initiator: true)`);
-  addDebug(`🔄 ICE 策略: 尝试所有方式 (all)`);
+  addDebug(`🔄 ICE 策略: ${isMobile ? 'relay (mobile)' : 'all (desktop)'}`);
   addDebug(`🌐 TURN 服务器数量: ${turnServers.length}`);
+  addDebug(`📦 ICE 候选池大小: ${isMobile ? 10 : 5}`);
+  addDebug(`⏱️ ICE 超时: ${isMobile ? 60000 : 45000}ms`);
   console.log('[SIMPLEPEER] Creating peer (initiator: true)');
-  console.log('[SIMPLEPEER] ICE transport policy: all (尝试所有方式)');
+  console.log('[SIMPLEPEER] ICE transport policy:', isMobile ? 'relay (mobile)' : 'all (desktop)');
+  console.log('[SIMPLEPEER] ICE candidate pool size:', isMobile ? 10 : 5);
+  console.log('[SIMPLEPEER] ICE complete timeout:', isMobile ? 60000 : 45000);
   console.log('[SIMPLEPEER] TURN servers:', turnServers.length);
   turnServers.forEach((server, i) => {
     const url = Array.isArray(server.urls) ? server.urls.join(', ') : server.urls;
@@ -614,10 +628,13 @@ export function connectSimplePeer(
 
   peer = new SimplePeer({
     initiator: true,
+    iceCompleteTimeout: isMobile ? 60000 : 45000,  // 移动端 60 秒超时
     config: {
       iceServers: turnServers,
-      // 移除强制中继限制，允许尝试所有连接方式
-      // iceTransportPolicy: 'relay'  // 已禁用 - VPN 友好模式
+      iceCandidatePoolSize: isMobile ? 10 : 5,  // 移动端收集更多候选
+      iceTransportPolicy: isMobile ? 'relay' : 'all',  // 移动端强制中继
+      bundlePolicy: 'max-bundle',  // 优化带宽
+      rtcpMuxPolicy: 'require',  // 优化连接
     },
     // 添加更多调试选项
     channelConfig: {},
@@ -626,9 +643,11 @@ export function connectSimplePeer(
       offerToReceiveAudio: false,
       offerToReceiveVideo: false
     },
+    // 移动端优化 - 合并 sdpTransform
     sdpTransform: (sdp: string) => {
       addDebug(`📜 SDP Transform 触发 (长度: ${sdp.length})`);
-      return sdp;
+      // 移除带宽限制
+      return sdp.replace(/b=AS:\d+/g, '');
     }
   });
 
