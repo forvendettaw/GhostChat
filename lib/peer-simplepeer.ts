@@ -185,13 +185,25 @@ async function tryConnectWorker(
             remotePeerId = msg.src;
 
             const turnServers = getTURNServers();
+            
+            // 检测 VPN 或复杂网络环境
+            const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+            const isVPN = connection ? 
+              (connection.type === 'vpn' || 
+               connection.effectiveType === 'slow-2g' || 
+               connection.effectiveType === '2g') : false;
+            const iceTransportPolicy = (isVPN || /Android|iPhone|iPad/i.test(navigator.userAgent)) ? 'relay' : 'all';
+            
             console.log('[SIMPLEPEER] Creating peer (initiator: false)');
+            console.log('[SIMPLEPEER] Network:', isVPN ? 'VPN detected' : 'Normal');
+            console.log('[SIMPLEPEER] ICE policy:', iceTransportPolicy);
 
             peer = new SimplePeer({
               initiator: false,
               trickle: false,
               config: {
-                iceServers: turnServers
+                iceServers: turnServers,
+                iceTransportPolicy: iceTransportPolicy
               }
             });
 
@@ -553,7 +565,7 @@ function setupPeer(
   // 设置 ICE 连接超时（移动端需要更长时间）
   // GitHub 研究显示移动端 + VPN 需要 60-120 秒才能完成 ICE 收集
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const timeoutMs = isMobile ? 120000 : 45000; // 移动端 120 秒，桌面 45 秒
+  const timeoutMs = isMobile ? 120000 : 90000; // 移动端 120 秒，桌面 90 秒
   addDebug(`⏱️ 连接超时设置: ${timeoutMs / 1000} 秒 (移动端: ${isMobile})`);
 
   connectionTimeout = setTimeout(() => {
@@ -599,11 +611,25 @@ export function connectSimplePeer(
   const turnServers = getTURNServers();
   console.log('[SIMPLEPEER] Creating peer (initiator: true)');
 
+  // 检测 VPN 或复杂网络环境
+  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+  const isVPN = connection ? 
+    (connection.type === 'vpn' || 
+     connection.effectiveType === 'slow-2g' || 
+     connection.effectiveType === '2g') : false;
+  
+  // 强制使用 TURN 中继（VPN 或移动网络）
+  const iceTransportPolicy = (isVPN || /Android|iPhone|iPad/i.test(navigator.userAgent)) ? 'relay' : 'all';
+  
+  console.log('[SIMPLEPEER] Network:', isVPN ? 'VPN detected' : 'Normal');
+  console.log('[SIMPLEPEER] ICE policy:', iceTransportPolicy);
+
   peer = new SimplePeer({
     initiator: true,
     trickle: false,
     config: {
-      iceServers: turnServers
+      iceServers: turnServers,
+      iceTransportPolicy: iceTransportPolicy  // VPN 模式下强制中继
     }
   });
 
