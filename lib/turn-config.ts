@@ -3,8 +3,10 @@ interface TURNProvider {
   username?: string;
   credential?: string;
   priority: number;
+  maxBandwidth?: number; // 最大带宽限制（Kbps）
 }
 
+// 移动端友好配置：优先使用 TCP 和 TLS TURN 服务器
 const TURN_PROVIDERS: TURNProvider[] = [
   // ===== 最高优先级：自托管/商业 TURN（最可靠） =====
 
@@ -23,8 +25,23 @@ const TURN_PROVIDERS: TURNProvider[] = [
     ],
     username: 'openrelayproject',
     credential: 'openrelayproject',
-    priority: 10
+    priority: 10,
+    maxBandwidth: 3000 // 限制为 3Mbps，避免被滥用
   },
+
+  // Twilio TURN（非常可靠，但需要账户）
+  // 如果你有 Twilio 账户，取消注释并配置
+  /*
+  {
+    urls: [
+      'turn:global.turn.twilio.com:3478?transport=tcp',
+      'turn:global.turn.twilio.com:443?transport=tcp',
+    ],
+    username: 'your-twilio-username',
+    credential: 'your-twilio-token',
+    priority: 15,
+  },
+  */
 
   // ===== 中优先级：其他免费 TURN 服务器 =====
 
@@ -56,6 +73,24 @@ const TURN_PROVIDERS: TURNProvider[] = [
     username: 'tempturn',
     credential: 'tempturn',
     priority: 40
+  },
+
+  // 添加更多公共 TURN 服务器
+  {
+    urls: [
+      'turn:meetrix.com:443?transport=tcp',
+      'turn:meetrix.com:3478',
+    ],
+    username: 'meetrix',
+    credential: 'meetrix',
+    priority: 45
+  },
+
+  {
+    urls: 'turn:relay.metered.ca:80',
+    username: 'free',
+    credential: 'free',
+    priority: 50
   },
 
   // Twilio STUN (可靠)
