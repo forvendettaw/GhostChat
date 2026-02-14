@@ -288,9 +288,9 @@ async function tryConnectWorker(
       }
     };
 
-    // 移动端网络可能较慢，增加超时时间到 45 秒
+    // 移动端网络可能较慢，增加超时时间到 60 秒
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const timeout = isMobile ? 45000 : 20000;
+    const timeout = isMobile ? 60000 : 20000;
     setTimeout(() => {
       if (ws?.readyState !== WebSocket.OPEN) {
         reject(new Error('Worker timeout'));
@@ -565,8 +565,8 @@ function setupPeer(
   // 设置 ICE 连接超时（移动端需要更长时间）
   // GitHub 研究显示移动端 + VPN 需要 60-120 秒才能完成 ICE 收集
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  // 增加超时到 2 分钟，给 ICE 更多时间
-  const timeoutMs = isMobile ? 180000 : 120000; // 移动端 3 分钟，桌面 2 分钟
+  // 增加超时到 3-4 分钟，给 ICE 更多时间
+  const timeoutMs = isMobile ? 240000 : 120000; // 移动端 4 分钟，桌面 2 分钟
   addDebug(`⏱️ 连接超时设置: ${timeoutMs / 1000} 秒 (移动端: ${isMobile})`);
 
   connectionTimeout = setTimeout(() => {

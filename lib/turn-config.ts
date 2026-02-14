@@ -5,71 +5,87 @@ interface TURNProvider {
   priority: number;
 }
 
-// 优化的 TURN 配置 - 更多服务器，更高可靠性
+// ===== 2025年最新 TURN/STUN 服务器配置 =====
+
+// 你的 Metered 专属 TURN Credentials (从 Dashboard 获取的)
+const METERED_CREDENTIALS = {
+  username: '048efb84440fbe8668df735c',
+  credential: 'o55dO9exHzRhVRXp',
+  urls: [
+    'stun:stun.relay.metered.ca:80',
+    'turn:standard.relay.metered.ca:80',
+    'turn:standard.relay.metered.ca:80?transport=tcp',
+    'turn:standard.relay.metered.ca:443',
+    'turns:standard.relay.metered.ca:443?transport=tcp'
+  ]
+};
+
 const TURN_PROVIDERS: TURNProvider[] = [
-  // ===== 高优先级：Open Relay (最可靠的免费 TURN) =====
+  // ===== 第一优先级：你的 Metered Credentials =====
   {
-    urls: [
-      'turns:openrelay.metered.ca:443?transport=tcp',
-      'turn:openrelay.metered.ca:443?transport=tcp', 
-      'turn:openrelay.metered.ca:80?transport=tcp',
-    ],
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-    priority: 10
+    urls: METERED_CREDENTIALS.urls,
+    username: METERED_CREDENTIALS.username,
+    credential: METERED_CREDENTIALS.credential,
+    priority: 1
   },
 
-  // ===== 中优先级：Twilio STUN =====
-  {
-    urls: 'stun:global.stun.twilio.com:3478',
-    priority: 20
-  },
-
-  // ===== 备用 TURN 服务器 =====
-  {
-    urls: [
-      'turn:numb.viagenie.ca:3478?transport=tcp',
-      'turn:numb.viagenie.ca:80?transport=tcp',
-    ],
-    username: 'webrtc@live.com',
-    credential: 'muazkh',
-    priority: 30
-  },
-
-  // ===== 更多免费 TURN =====
-  {
-    urls: [
-      'turn:stunator.com:3478?transport=tcp',
-      'turn:stunator.com:80?transport=tcp',
-    ],
-    username: 'test',
-    credential: 'test',
-    priority: 40
-  },
-
-  // ===== STUN 服务器 =====
+  // ===== Google STUN (最可靠) =====
   {
     urls: [
       'stun:stun.l.google.com:19302',
       'stun:stun1.l.google.com:19302',
       'stun:stun2.l.google.com:19302',
     ],
-    priority: 100
+    priority: 20
   },
 
+  // ===== Cloudflare + Twilio STUN =====
   {
     urls: 'stun:stun.cloudflare.com:3478',
-    priority: 101
+    priority: 30
+  },
+  {
+    urls: 'stun:global.stun.twilio.com:3478',
+    priority: 40
+  },
+
+  // ===== 备用 TURN =====
+  {
+    urls: [
+      'turns:openrelay.metered.ca:443?transport=tcp',
+      'turn:openrelay.metered.ca:443?transport=tcp',
+    ],
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+    priority: 50
+  },
+
+  // ===== 更多 STUN =====
+  {
+    urls: [
+      'stun:stun.ekiga.net',
+      'stun:stun.ideasip.com',
+    ],
+    priority: 100
   }
 ];
 
 export function getTURNServers(): RTCIceServer[] {
   const servers: RTCIceServer[] = [];
   
-  // 按优先级排序
+  // 优先使用你的 Metered credentials
+  servers.push({
+    urls: METERED_CREDENTIALS.urls,
+    username: METERED_CREDENTIALS.username,
+    credential: METERED_CREDENTIALS.credential
+  });
+  
+  // 添加备用服务器
   const sorted = [...TURN_PROVIDERS].sort((a, b) => a.priority - b.priority);
   
   for (const provider of sorted) {
+    if (provider.priority === 1) continue; // 已添加
+    
     const server: RTCIceServer = {
       urls: provider.urls
     };
